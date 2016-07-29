@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="55dp"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.iwebnext.vchatt.activity.LoginActivity"
+    tools:showIn="@layout/activity_login"
+    android:background="@drawable/background">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/iv_logo"
+            android:layout_width="330dp"
+            android:layout_height="100dp"
+            android:src="@drawable/vchat_logo"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:paddingBottom="10dp"/>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingRight="20dp"
+            android:background="#00F0F8FF"
+            android:weightSum="1">
+
+            <EditText
+
+                android:id="@+id/input_email"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:hint="@string/hint_email"
+                android:inputType="textEmailAddress"
+                android:padding="10dp"
+                android:background="@drawable/rounded_edittext"
+                android:singleLine="true"
+                android:textColor="#222222"
+                android:textColorHint="#999999" />
+
+            <EditText
+                android:id="@+id/input_password"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/rounded_edittext"
+                android:hint="@string/hint_password"
+                android:inputType="textPassword"
+                android:padding="10dp"
+                android:singleLine="true"
+                android:textColor="#222222"
+                android:textColorHint="#999999" />
+
+
+            <Button android:id="@+id/btn_enter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SignIn"
+                android:textSize="15dp"
+                android:textColor="#ffff"
+                android:background="@drawable/rounded_button"/>
+
+            <com.facebook.login.widget.LoginButton
+                android:id="@+id/login_fb_button"
+                android:background="@drawable/rounded_fb_button"
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.28" />
+
+
+            <TextView
+                android:id="@+id/tv_sign_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
+                android:paddingTop="25dp"
+                android:paddingBottom="20dp"
+                android:paddingLeft="95dp"
+                android:text="sign up for vchat"
+                android:textColor="#ffff" />
+            <TextView
+                android:id="@+id/tv_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/tv_sign_up"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="#f5f5f5" />
+
+            <TextView
+                android:id="@+id/tv_forget_password"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:paddingTop="20dp"
+                android:paddingLeft="95dp"
+                android:text="forgot password"
+                android:textColor="#ffff" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+    <com.github.silvestrpredko.dotprogressbar.DotProgressBar
+        android:visibility="gone"
+        android:id="@+id/login_progress_bar"
+        android:layout_below="@+id/tv_sent_email"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="center|bottom"
+        android:layout_marginTop="20dp"
+        custom:amount="3"
+        custom:duration="@android:integer/config_mediumAnimTime"
+        custom:endColor="@color/light_blue_A400"
+        custom:startColor="@color/light_blue_A700"/>
+
+</RelativeLayout>

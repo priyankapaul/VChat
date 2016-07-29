@@ -1,0 +1,35 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.MainActivity">
+
+    <item
+        android:id="@+id/action_logout"
+        android:orderInCategory="100"
+        android:title="@string/action_logout"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_search"
+        android:title="hint_search"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
+
+    <!--<item android:id="@+id/action_search"
+        android:title="hint_search"
+        android:icon="@drawable/search"
+        app:showAsAction="collapseActionView|ifRoom"
+         />-->
+
+    <!--<item android:id="@+id/action_attach_video"-->
+        <!--android:title="Attach video"-->
+        <!--android:icon="@drawable/attachment"-->
+        <!--app:showAsAction="never"-->
+        <!--/>-->
+
+    <!--<item android:id="@+id/action_attach_picture"-->
+        <!--android:title="attach_picture"-->
+        <!--android:icon="@drawable/attach_picture"-->
+        <!--app:showAsAction="collapseActionView|ifRoom"-->
+        <!--/>-->
+</menu>
