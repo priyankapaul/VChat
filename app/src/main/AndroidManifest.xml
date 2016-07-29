@@ -19,7 +19,7 @@
         android:name="com.iwebnext.vchatt.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="info.androidhive.gcm.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.iwebnext.vchatt.permission.C2D_MESSAGE" />
 
     <!-- END Added for GCM -->
     <application
@@ -81,9 +81,6 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-
-                <!--<category android:name="info.androidhive.gcm" />-->
-                <!--<category android:name="info.androidhive.gcm" />-->
             </intent-filter>
         </receiver>
 
@@ -93,8 +90,6 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-
-                <!--<category android:name="info.androidhive.gcm" />-->
             </intent-filter>
         </service>
         <service
