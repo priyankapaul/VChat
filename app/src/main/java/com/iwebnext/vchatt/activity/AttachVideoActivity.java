@@ -40,8 +40,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Hashtable;
-import java.util.Map;
 
 public class AttachVideoActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -88,7 +86,7 @@ public class AttachVideoActivity extends AppCompatActivity implements View.OnCli
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.READ_EXTERNAL_STORAGE)) {
 
-                // Show an expanation to the user *asynchronously* -- don't block
+                // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
 
@@ -132,11 +130,11 @@ public class AttachVideoActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CODE_SELECT_VIDEO) {
-                Uri selectedVideoUri = data.getData();
+                Uri selectedVideoUri = intent.getData();
                 selectedPath = getPath(selectedVideoUri);
                 textView.setText(selectedPath);
                 attachVideo.setVideoURI(selectedVideoUri);
@@ -184,15 +182,14 @@ public class AttachVideoActivity extends AppCompatActivity implements View.OnCli
     /**
      * This function upload the large file to server with other POST values.
      *
-     * @param file   actual path to the file to be uploaded
-     * @param userId user id of the uploader
      * @return
      */
-    public String uploadVideo(String file, String userId) {
+    public String uploadVideo() {
+        String userId = MyApplication.getInstance().getPrefManager().getUser().getId();
 
-        String fileName = file;
+        String fileName = selectedPath;
         HttpURLConnection conn = null;
-        DataOutputStream dos = null;
+        DataOutputStream dataOutputStream = null;
         String lineEnd = "\r\n";
         String twoHyphens = "--";
         String boundary = "*****";
@@ -200,7 +197,7 @@ public class AttachVideoActivity extends AppCompatActivity implements View.OnCli
         byte[] buffer;
         int maxBufferSize = 1 * 1024 * 1024;
 
-        File sourceFile = new File(file);
+        File sourceFile = new File(fileName);
         if (!sourceFile.isFile()) {
             Log.i(TAG, "Source File Does not exist");
             return null;
@@ -213,22 +210,24 @@ public class AttachVideoActivity extends AppCompatActivity implements View.OnCli
             conn.setDoInput(true);
             conn.setDoOutput(true);
             conn.setUseCaches(false);
+
             conn.setRequestMethod("POST");
+
             conn.setRequestProperty("Connection", "Keep-Alive");
             conn.setRequestProperty("ENCTYPE", "multipart/form-data");
             conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
 //            conn.setRequestProperty("file", fileName);
-            dos = new DataOutputStream(conn.getOutputStream());
+            dataOutputStream = new DataOutputStream(conn.getOutputStream());
 
 
             /**
              * 1st - File Part
              */
-            dos.writeBytes(twoHyphens + boundary + lineEnd);
+            dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
 
-            dos.writeBytes("Content-Disposition: form-data; name=\"file\";filename=\"" + fileName + "\"" + lineEnd);
+            dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"file\";filename=\"" + fileName + "\"" + lineEnd);
 //            Log.i(TAG, "fileName is" + fileName);
-            dos.writeBytes(lineEnd);
+            dataOutputStream.writeBytes(lineEnd);
 
             bytesAvailable = fileInputStream.available();
 //            Log.i(TAG, "Size of upload file = " + bytesAvailable);
@@ -239,47 +238,47 @@ public class AttachVideoActivity extends AppCompatActivity implements View.OnCli
             bytesRead = fileInputStream.read(buffer, 0, bufferSize);
 
             while (bytesRead > 0) {
-                dos.write(buffer, 0, bufferSize);
+                dataOutputStream.write(buffer, 0, bufferSize);
                 bytesAvailable = fileInputStream.available();
                 bufferSize = Math.min(bytesAvailable, maxBufferSize);
                 bytesRead = fileInputStream.read(buffer, 0, bufferSize);
             }
 
-            dos.writeBytes(lineEnd);
+            dataOutputStream.writeBytes(lineEnd);
 
 
             /**
              * 2nd - String Part
              */
-            dos.writeBytes(twoHyphens + boundary + lineEnd);
-            dos.writeBytes("Content-Disposition: form-data; name=\"user_id\"");
-            dos.writeBytes(lineEnd);
+            dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
+            dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"user_id\"");
+            dataOutputStream.writeBytes(lineEnd);
 
-            dos.writeBytes(lineEnd);
-            dos.writeBytes(userId);
-            dos.writeBytes(lineEnd);
+            dataOutputStream.writeBytes(lineEnd);
+            dataOutputStream.writeBytes(userId);
+            dataOutputStream.writeBytes(lineEnd);
 
             /**
              * 3rd - String Part
              */
-            dos.writeBytes(twoHyphens + boundary + lineEnd);
-            dos.writeBytes("Content-Disposition: form-data; name=\"friend_id\"");
-            dos.writeBytes(lineEnd);
+            dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
+            dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"friend_id\"");
+            dataOutputStream.writeBytes(lineEnd);
 
-            dos.writeBytes(lineEnd);
-            dos.writeBytes(friendId);
-            dos.writeBytes(lineEnd);
+            dataOutputStream.writeBytes(lineEnd);
+            dataOutputStream.writeBytes(friendId);
+            dataOutputStream.writeBytes(lineEnd);
 
             /**
              * SIGNALS END OF REQUEST PARTS
              */
-            dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+            dataOutputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
 
             serverResponseCode = conn.getResponseCode();
 
             fileInputStream.close();
-            dos.flush();
-            dos.close();
+            dataOutputStream.flush();
+            dataOutputStream.close();
         } catch (MalformedURLException ex) {
             ex.printStackTrace();
         } catch (Exception e) {
@@ -308,40 +307,28 @@ public class AttachVideoActivity extends AppCompatActivity implements View.OnCli
     /**
      * Inner class -- AsyncTask to upload video
      */
-    class UploadVideoAsyncTask extends AsyncTask<String, String, Map<String, String>> {
+    class UploadVideoAsyncTask extends AsyncTask<Void, Void, Void> {
 
-        ProgressDialog uploading;
+        ProgressDialog progressDialog;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            uploading = ProgressDialog.show(AttachVideoActivity.this, "Uploading File", "Please wait...", false, false);
+            progressDialog = ProgressDialog.show(AttachVideoActivity.this, "Uploading File", "Please wait...", false, false);
         }
 
         @Override
-        protected void onPostExecute(Map<String, String> s) {
-            super.onPostExecute(s);
-            uploading.dismiss();
-            textViewResponse.setText(Html.fromHtml("<b>Uploaded at <a href='" + s + "'>" + s + "</a></b>"));
+        protected Void doInBackground(Void... params) {
+            uploadVideo();
+            return null;
         }
 
         @Override
-        protected Map<String, String> doInBackground(String... args) {
-
-            final String userId = MyApplication.getInstance().getPrefManager().getUser().getId();
-
-            String msg = uploadVideo(selectedPath, userId);
-
-            Log.i(TAG, "user_id" + selectedPath);
-
-            Map<String, String> params = new Hashtable<String, String>();
-            params.put("user_id", userId);
-            params.put("id", friendId);
-
-            Log.i(TAG, "Friend id is" + friendId);
-            Log.i(TAG, "user id is" + userId);
-
-            return params;
+        protected void onPostExecute(Void v) {
+            super.onPostExecute(v);
+            progressDialog.dismiss();
+//            textViewResponse.setText(Html.fromHtml("<b>Uploaded at <a href='" + s + "'>" + s + "</a></b>"));
         }
+
     }
 }
