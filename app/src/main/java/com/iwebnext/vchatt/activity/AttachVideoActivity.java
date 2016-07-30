@@ -217,16 +217,21 @@ public class AttachVideoActivity extends AppCompatActivity implements View.OnCli
             conn.setRequestProperty("Connection", "Keep-Alive");
             conn.setRequestProperty("ENCTYPE", "multipart/form-data");
             conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-            conn.setRequestProperty("file", fileName);
+//            conn.setRequestProperty("file", fileName);
             dos = new DataOutputStream(conn.getOutputStream());
 
+
+            /**
+             * 1st - File Part
+             */
             dos.writeBytes(twoHyphens + boundary + lineEnd);
+
             dos.writeBytes("Content-Disposition: form-data; name=\"file\";filename=\"" + fileName + "\"" + lineEnd);
-            Log.i(TAG, "fileName is" + fileName);
+//            Log.i(TAG, "fileName is" + fileName);
             dos.writeBytes(lineEnd);
 
             bytesAvailable = fileInputStream.available();
-            Log.i(TAG, "Size of upload file = " + bytesAvailable);
+//            Log.i(TAG, "Size of upload file = " + bytesAvailable);
 
             bufferSize = Math.min(bytesAvailable, maxBufferSize);
             buffer = new byte[bufferSize];
@@ -241,13 +246,34 @@ public class AttachVideoActivity extends AppCompatActivity implements View.OnCli
             }
 
             dos.writeBytes(lineEnd);
-            dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
 
+
+            /**
+             * 2nd - String Part
+             */
+            dos.writeBytes(twoHyphens + boundary + lineEnd);
             dos.writeBytes("Content-Disposition: form-data; name=\"user_id\"");
             dos.writeBytes(lineEnd);
 
-            dos.writeBytes("" + userId);
             dos.writeBytes(lineEnd);
+            dos.writeBytes(userId);
+            dos.writeBytes(lineEnd);
+
+            /**
+             * 3rd - String Part
+             */
+            dos.writeBytes(twoHyphens + boundary + lineEnd);
+            dos.writeBytes("Content-Disposition: form-data; name=\"friend_id\"");
+            dos.writeBytes(lineEnd);
+
+            dos.writeBytes(lineEnd);
+            dos.writeBytes(friendId);
+            dos.writeBytes(lineEnd);
+
+            /**
+             * SIGNALS END OF REQUEST PARTS
+             */
+            dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
 
             serverResponseCode = conn.getResponseCode();
 
@@ -303,9 +329,6 @@ public class AttachVideoActivity extends AppCompatActivity implements View.OnCli
         protected Map<String, String> doInBackground(String... args) {
 
             final String userId = MyApplication.getInstance().getPrefManager().getUser().getId();
-
-            Intent intent = getIntent();
-            final String friendId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
 
             String msg = uploadVideo(selectedPath, userId);
 
