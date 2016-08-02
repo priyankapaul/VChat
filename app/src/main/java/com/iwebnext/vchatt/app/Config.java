@@ -1,6 +1,5 @@
 package com.iwebnext.vchatt.app;
 
-
 public class Config {
 
     // flag to identify whether to show single line
