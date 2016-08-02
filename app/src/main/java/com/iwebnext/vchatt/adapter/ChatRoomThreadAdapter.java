@@ -27,7 +27,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
     private int SELF = 100;
     private static String today;
 
-    private Context mContext;
+    private Context context;
     private ArrayList<Message> messageArrayList;
 
 
@@ -46,8 +46,8 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
         }
     }
 
-    public ChatRoomThreadAdapter(Context mContext, ArrayList<Message> messageArrayList, String userId) {
-        this.mContext = mContext;
+    public ChatRoomThreadAdapter(Context context, ArrayList<Message> messageArrayList, String userId) {
+        this.context = context;
         this.messageArrayList = messageArrayList;
         this.userId = userId;
 
@@ -115,7 +115,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
 //            }
 //        });
 //
-//        MediaController vidControl = new MediaController(this.mContext);
+//        MediaController vidControl = new MediaController(this.context);
 //        vidControl.setAnchorView(holder.videoSent);
 //        holder.videoSent.setMediaController(vidControl);
 //        holder.videoSent.getBufferPercentage();
