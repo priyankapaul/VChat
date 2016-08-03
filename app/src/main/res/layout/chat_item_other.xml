@@ -34,9 +34,10 @@
         android:id="@+id/image_sent"/>
 
     <VideoView
-        android:layout_width="250dp"
+        android:layout_width="300dp"
+        android:paddingTop="20dp"
         android:layout_height="200dp"
         android:id="@+id/video_sent"
-        android:visibility="gone"/>
+        />
 
 </RelativeLayout>

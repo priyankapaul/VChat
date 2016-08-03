@@ -24,6 +24,7 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.StringRequest;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
@@ -37,6 +38,13 @@ import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.github.silvestrpredko.dotprogressbar.DotProgressBar;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.app.MyApplication;
 import com.iwebnext.vchatt.model.User;
@@ -51,7 +59,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private String TAG = LoginActivity.class.getSimpleName();
     private EditText inputPassword, inputEmail;
@@ -62,6 +70,13 @@ public class LoginActivity extends AppCompatActivity {
     private CallbackManager callbackManager;
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
+    private GoogleSignInOptions gso;
+    private SignInButton signInButton;
+    //google api client
+    private GoogleApiClient mGoogleApiClient;
+
+    //Signin constant to check the activity result
+    private int RC_SIGN_IN = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,14 +116,33 @@ public class LoginActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
         LoginButton loginButton = (LoginButton) findViewById(R.id.login_fb_button);
         inputEmail = (EditText) findViewById(R.id.input_email);
         inputPassword = (EditText) findViewById(R.id.input_password);
         btnEnter = (Button) findViewById(R.id.btn_enter);
+
         tvSignUp = (TextView) findViewById(R.id.tv_sign_up);
         tvForgetPassword = (TextView) findViewById(R.id.tv_forget_password);
         progressBar = (DotProgressBar) findViewById(R.id.login_progress_bar);
         inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
+
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        signInButton = (SignInButton) findViewById(R.id.login_gplus_button);
+        signInButton.setSize(SignInButton.SIZE_WIDE);
+        signInButton.setScopes(gso.getScopeArray());
+
+        //Initializing google api client
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(LoginActivity.this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+
+        //Setting onclick listener to signing button
 
         loginButton.setReadPermissions("user_friends");
         loginButton.setReadPermissions("email");
@@ -149,8 +183,69 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+
+        signInButton.setOnClickListener(new View.OnClickListener() {
+
+
+            @Override
+            public void onClick(View v) {
+                if (v == signInButton) {
+                    //Calling signin
+                    signIn();
+                }
+            }
+
+
+        });
+
+    }
+    private void signIn() {
+        //Creating an intent
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+
+        //Starting intent for result
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+
+
+    //After the signing we are calling this function
+    private void handleSignInResult(GoogleSignInResult result) {
+        //If the login succeed
+        if (result.isSuccess()) {
+            //Getting google account
+            GoogleSignInAccount acct = result.getSignInAccount();
+
+            //Displaying name and email
+
+            inputEmail.setText(acct.getEmail());
+
+//            //Initializing image loader
+//            imageLoader = CustomVolleyRequest.getInstance(this.getApplicationContext())
+//                    .getImageLoader();
+//
+//            imageLoader.get(acct.getPhotoUrl().toString(),
+//                    ImageLoader.getImageListener(profilePhoto,
+//                            R.mipmap.ic_launcher,
+//                            R.mipmap.ic_launcher));
+//
+//            //Loading image
+//            profilePhoto.setImageUrl(acct.getPhotoUrl().toString(), imageLoader);
+
+        } else {
+            //If login fails
+            Toast.makeText(this, "Login Failed", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+//    @Override
+//    public void onConnectionFailed(ConnectionResult connectionResult) {
+//
+//    }
+
+
+    //gplus end
 
     public void printHashKey() {
         // Add code to print out the key hash
@@ -287,6 +382,11 @@ public class LoginActivity extends AppCompatActivity {
         return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
     private class MyTextWatcher implements TextWatcher {
 
         private View view;
@@ -325,7 +425,14 @@ public class LoginActivity extends AppCompatActivity {
                 inputEmail.setText(email);
             }
         }
+        else {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            //Calling a new function to handle signin
+            handleSignInResult(result);
+        }
     }
+
+
 
     private void displayMessage(Profile profile) {
         if (profile != null) {

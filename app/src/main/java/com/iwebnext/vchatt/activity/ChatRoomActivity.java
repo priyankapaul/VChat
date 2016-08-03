@@ -316,7 +316,8 @@ public class ChatRoomActivity extends AppCompatActivity {
                             String createdAt = commentObj.getString("created_at");
                             String messageType = commentObj.getString("message_type");
                             String image = commentObj.getString("message");
-                            //  msg.setImage(commentObj.getString("message"));
+                            String video = commentObj.getString("message");
+
                             String userId = userObj.getString("user_id");
                             String userName = userObj.getString("username");
 
@@ -329,17 +330,17 @@ public class ChatRoomActivity extends AppCompatActivity {
                             if (messageType.equals("text")) {
                                 message.setMessage(commentText);
                             } else if (messageType.equals("image")) {
-                                //  msg.setImage(commentObj.getString("message"));
-                                // message.setImage(userObj.getString("message"));
                                 message.setImage(image);
-                                //handle sent image
+
+                            }
+                            else  {
+                                message.setVideoUrl(video);
+
                             }
                             //message.setMessage(commentText);
                             message.setCreatedAt(createdAt);
                             message.setUser(user);
-
-                            message.setMessageType(messageType);
-
+                            //  message.setMessageType(messageType);
                             messageArrayList.add(message);
                         }
 

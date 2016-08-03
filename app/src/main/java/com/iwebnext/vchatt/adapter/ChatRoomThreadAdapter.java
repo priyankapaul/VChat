@@ -1,10 +1,14 @@
 package com.iwebnext.vchatt.adapter;
 
 import android.content.Context;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.MediaController;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -27,7 +31,8 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
     private int SELF = 100;
     private static String today;
 
-    private Context context;
+
+    private Context mContext;
     private ArrayList<Message> messageArrayList;
 
 
@@ -35,6 +40,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
         TextView message, timestamp;
         NetworkImageView ivImgSent;
         VideoView videoSent;
+        public ProgressBar loadingProgressBar;
 
         public ViewHolder(View view) {
             super(view);
@@ -46,8 +52,8 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
         }
     }
 
-    public ChatRoomThreadAdapter(Context context, ArrayList<Message> messageArrayList, String userId) {
-        this.context = context;
+    public ChatRoomThreadAdapter(Context mContext, ArrayList<Message> messageArrayList, String userId) {
+        this.mContext = mContext;
         this.messageArrayList = messageArrayList;
         this.userId = userId;
 
@@ -93,49 +99,56 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
         Message message = messageArrayList.get(position);
         String timestamp = getTimeStamp(message.getCreatedAt());
         if (message.getUser().getName() != null)
-
-        holder.message.setText(message.getMessage());
+            holder.message.setText(message.getMessage());
         holder.ivImgSent.setImageUrl(message.getImage(), MyApplication.getInstance().getImageLoader());
 
-//        Uri videoURI=Uri.parse(message.getVideoUrl());
-//        holder.videoSent.setVideoURI(videoURI);
-//        holder.videoSent.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//            @Override
-//            public void onPrepared(MediaPlayer mp) {
-//                mp.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
-//                    @Override
-//                    public void onBufferingUpdate(MediaPlayer mp, int percent) {
-//                        if (percent == 100) {
-//                            //video have completed buffering
-//                        }
-//
-//                    }
-//                });
-//                holder.videoSent.start();
-//            }
-//        });
-//
-//        MediaController vidControl = new MediaController(this.context);
-//        vidControl.setAnchorView(holder.videoSent);
-//        holder.videoSent.setMediaController(vidControl);
-//        holder.videoSent.getBufferPercentage();
-//
 
-       /* if(message.getMessageType().contains("image"))
-        {
-            holder.ivImgSent.setImageUrl(message.getImage(), MyApplication.getInstance().getImageLoader());
-            holder.message.setVisibility(View.GONE);
+        try {
+            Uri videoURI = Uri.parse(message.getVideoUrl());
 
-        }
-        else{
+            holder.videoSent.setVideoURI(videoURI);
+            holder.videoSent.setBackgroundResource(R.drawable.black);
             holder.ivImgSent.setVisibility(View.GONE);
-            holder.message.setText(message.getMessage());
+            holder.videoSent.setVisibility(View.VISIBLE);
+            holder.videoSent.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
 
-        }*/
+                    System.out.println("getting ready");
+
+                    holder.videoSent.setBackgroundResource(0);
+
+                    mp.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
+                        @Override
+                        public void onBufferingUpdate(MediaPlayer mp, int percent) {
+
+                            int a = 0;
+                            if (percent > a) {
+                                a = percent;
+                            }
+                            if (mp.isPlaying()) {
+
+                                holder.loadingProgressBar.setVisibility(View.GONE);
+                            } else {
+                                holder.loadingProgressBar.setVisibility(View.VISIBLE);
+                            }
+                            holder.videoSent.start();
+                        }
+                    });
+
+                }
+            });
+
+            MediaController vidControl = new MediaController(this.mContext);
+            vidControl.setAnchorView(holder.videoSent);
+            holder.videoSent.setMediaController(vidControl);
+            holder.videoSent.getBufferPercentage();
 
 
-        //holder.ivImgSent.setImageUrl(message.getImage(), MyApplication.getInstance().getImageLoader());
-        // holder.ivImgSent.setImageUrl("http://inextwebs.com/gcm_chat/image_sent/144.png", MyApplication.getInstance().getImageLoader());
+        } catch (Exception e) {
+
+            System.out.println("video exception" + e.getLocalizedMessage());
+        }
     }
 
 
