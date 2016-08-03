@@ -16,38 +16,40 @@
         android:scrollbars="vertical" />
 
     <LinearLayout
-        android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:background="@android:color/white"
         android:orientation="horizontal"
         android:weightSum="4">
 
-        <EditText android:id="@+id/message"
+        <EditText
+            android:id="@+id/message"
             android:layout_width="0dp"
-            android:hint="Enter message"
-            android:paddingLeft="10dp"
-            android:background="@null"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="16dp"
-            android:lines="1"
             android:layout_height="wrap_content"
-            android:layout_weight="3" />
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="3"
+            android:background="@null"
+            android:hint="Enter message"
+            android:lines="1"
+            android:paddingLeft="10dp" />
 
         <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/image_sent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:id="@+id/image_sent"/>
+            android:visibility="gone" />
 
-        <Button android:id="@+id/btn_send"
+        <Button
+            android:id="@+id/btn_send"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@null"
             android:text="SEND"
-            android:textSize="16dp"
-            android:textColor="@color/colorPrimary" />
+            android:textColor="@color/colorPrimary"
+            android:textSize="16dp" />
 
     </LinearLayout>
 

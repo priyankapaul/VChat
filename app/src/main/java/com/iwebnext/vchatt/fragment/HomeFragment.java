@@ -224,7 +224,7 @@ public class HomeFragment extends Fragment implements MainActivity.SearchQueryLi
             // push belongs to user alone
             // just showing the message in a toast
             Message message = (Message) intent.getSerializableExtra("message");
-            Toast.makeText(getActivity(), "New push: " + message.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "New push: " + message.getContent(), Toast.LENGTH_LONG).show();
         }
 
 
@@ -238,7 +238,7 @@ public class HomeFragment extends Fragment implements MainActivity.SearchQueryLi
         for (Friend friend : friendsArrayList) {
             if (friend.getId().equals(friendId)) {
                 int index = friendsArrayList.indexOf(friend);
-                friend.setLastMessage(message.getMessage());
+                friend.setLastMessage(message.getContent());
                 friend.setUnreadCount(friend.getUnreadCount() + 1);
                 friendsArrayList.remove(index);
                 friendsArrayList.add(index, friend);

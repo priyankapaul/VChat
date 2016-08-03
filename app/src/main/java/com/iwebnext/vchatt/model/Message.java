@@ -4,19 +4,22 @@ import java.io.Serializable;
 
 
 public class Message implements Serializable {
-    String id, message, createdAt, messageType, image,videoUrl;
+    // Message Types
+    public static int TEXT = 0;
+    public static int IMAGE = 1;
+    public static int VIDEO = 2;
+
+    String id, content, createdAt;
+    int type;
+
     User user;
 
-    public Message() {
-    }
-
-    public Message(String id, String message, String createdAt, User user, String messageType, String image) {
+    public Message(String id, String content, String createdAt, User user, int type) {
         this.id = id;
-        this.message = message;
+        this.content = content;
         this.createdAt = createdAt;
         this.user = user;
-        this.messageType = messageType;
-        this.image = message;
+        this.type = type;
     }
 
     public String getId() {
@@ -27,28 +30,20 @@ public class Message implements Serializable {
         this.id = id;
     }
 
-    public String getMessageType() {
-        return messageType;
+    public int getType() {
+        return type;
     }
 
-    public void setMessageType(String messageType) {
-        this.messageType = messageType;
+    public void setType(int type) {
+        this.type = type;
     }
 
-    public String getMessage() {
-        return message;
+    public String getContent() {
+        return content;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getCreatedAt() {
@@ -65,13 +60,5 @@ public class Message implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public String getVideoUrl() {
-        return videoUrl;
-    }
-
-    public void setVideoUrl(String videoUrl) {
-        this.videoUrl = videoUrl;
     }
 }

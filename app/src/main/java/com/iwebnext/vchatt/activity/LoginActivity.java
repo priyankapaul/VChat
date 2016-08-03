@@ -298,7 +298,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
                         JSONObject userObj = obj.getJSONObject("user");
                         User user = new User(userObj.getString("user_id"),
-                                userObj.getString("password"),
+                                userObj.getString("name"),
                                 userObj.getString("email"));
 
                         // storing user in shared preferences
@@ -331,8 +331,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("name", password);
                 params.put("email", email);
+                params.put("password", password);
 
                 Log.e(TAG, "params: " + params.toString());
                 return params;

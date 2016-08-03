@@ -76,7 +76,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         toolbar.setTitle(title);
         setSupportActionBar(toolbar);
 
-        inputMessage = (EditText) findViewById(R.id.message);
+        inputMessage = (EditText) findViewById(R.id.tv_text_msg);
         btnSend = (Button) findViewById(R.id.btn_send);
 
         rvChatThread = (RecyclerView) findViewById(R.id.recycler_view);
@@ -192,7 +192,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             return;
         }
 
-        String endPoint = EndPoints.CHAT_ROOM_MESSAGE.replace("_ID_", friendId);
+        String endPoint = EndPoints.ADD_MESSAGE;
 
         Log.e(TAG, "endpoint: " + endPoint);
 
@@ -210,22 +210,21 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                     // check for error
                     if (obj.getBoolean("error") == false) {
-                        JSONObject commentObj = obj.getJSONObject("message");
+                        JSONObject msgObj = obj.getJSONObject("message");
 
-                        String commentId = commentObj.getString("message_id");
-                        String commentText = commentObj.getString("message");
-                        String createdAt = commentObj.getString("created_at");
+                        String msgId = msgObj.getString("message_id");
+                        String content = msgObj.getString("content");
+                        String createdAt = msgObj.getString("created_at");
 
                         JSONObject userObj = obj.getJSONObject("user");
                         String userId = userObj.getString("user_id");
                         String userName = userObj.getString("name");
-                        User user = new User(userId, userName, null);
+                        String userEmail = userObj.getString("email");
+                        User user = new User(userId, userName, userEmail);
 
-                        Message message = new Message();
-                        message.setId(commentId);
-                        message.setMessage(commentText);
-                        message.setCreatedAt(createdAt);
-                        message.setUser(user);
+                        // TODO - Make one single API to upload video/image or text
+                        // For now hard coding it to Type TEXT
+                        Message message = new Message(msgId, content, createdAt, user, Message.TEXT);
 
                         messageArrayList.add(message);
 
@@ -259,6 +258,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("user_id", MyApplication.getInstance().getPrefManager().getUser().getId());
+                params.put("peer_id", friendId);
                 params.put("message", message);
 
                 Log.e(TAG, "Params: " + params.toString());
@@ -287,7 +287,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void fetchChatThread() {
 
         String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
-        String endPoint = EndPoints.CHAT_THREAD.replace("_ID_", friendId);
+        String endPoint = EndPoints.MESSAGES.replace("_ID_", friendId);
         endPoint = endPoint.replace("_MY_", selfUserId);
         Log.e(TAG, "endPoint: " + endPoint);
 
@@ -304,43 +304,25 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                     // check for error
                     if (obj.getBoolean("error") == false) {
-                        JSONArray commentsObj = obj.getJSONArray("messages");
+                        JSONArray msgJsonArr = obj.getJSONArray("messages");
 
-                        for (int i = 0; i < commentsObj.length(); i++) {
-                            JSONObject commentObj = (JSONObject) commentsObj.get(i);
+                        for (int i = 0; i < msgJsonArr.length(); i++) {
+                            JSONObject msgObj = (JSONObject) msgJsonArr.get(i);
 
-                            //  Message msg = new Message();
-                            JSONObject userObj = commentObj.getJSONObject("user");
-                            String commentId = commentObj.getString("message_id");
-                            String commentText = commentObj.getString("message");
-                            String createdAt = commentObj.getString("created_at");
-                            String messageType = commentObj.getString("message_type");
-                            String image = commentObj.getString("message");
-                            String video = commentObj.getString("message");
+                            String commentText = msgObj.getString("content");
+                            String commentId = msgObj.getString("message_id");
+                            String createdAt = msgObj.getString("created_at");
+                            int type = msgObj.getInt("type");
 
+                            // parse User object
+                            JSONObject userObj = msgObj.getJSONObject("user");
                             String userId = userObj.getString("user_id");
-                            String userName = userObj.getString("username");
+                            String userName = userObj.getString("user_name");
 
-
+                            // TODO - SEND EMAIL ALSO IN RESPONSE
                             User user = new User(userId, userName, null);
 
-
-                            Message message = new Message();
-                            message.setId(commentId);
-                            if (messageType.equals("text")) {
-                                message.setMessage(commentText);
-                            } else if (messageType.equals("image")) {
-                                message.setImage(image);
-
-                            }
-                            else  {
-                                message.setVideoUrl(video);
-
-                            }
-                            //message.setMessage(commentText);
-                            message.setCreatedAt(createdAt);
-                            message.setUser(user);
-                            //  message.setMessageType(messageType);
+                            Message message = new Message(commentId, commentText, createdAt, user, type);
                             messageArrayList.add(message);
                         }
 
@@ -354,7 +336,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                 } catch (JSONException e) {
                     Log.e(TAG, "json parsing error: " + e.getMessage());
-                    //Toast.makeText(getApplicationContext(), "json parse error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "json parse error: " + e.getContent(), Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {

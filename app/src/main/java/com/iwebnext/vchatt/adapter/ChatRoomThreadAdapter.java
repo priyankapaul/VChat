@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,17 +38,17 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView message, timestamp;
+        TextView tvTextMsg, timestamp;
         NetworkImageView ivImgSent;
         VideoView videoSent;
         public ProgressBar loadingProgressBar;
 
         public ViewHolder(View view) {
             super(view);
-            message = (TextView) view.findViewById(R.id.message);
+            tvTextMsg = (TextView) view.findViewById(R.id.tv_text_msg);
             timestamp = (TextView) view.findViewById(R.id.timestamp);
-            ivImgSent = (NetworkImageView) view.findViewById(R.id.image_sent);
-            videoSent = (VideoView) view.findViewById(R.id.video_sent);
+            ivImgSent = (NetworkImageView) view.findViewById(R.id.niv_image);
+            videoSent = (VideoView) view.findViewById(R.id.vv_video);
 
         }
     }
@@ -97,57 +98,49 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Message message = messageArrayList.get(position);
-        String timestamp = getTimeStamp(message.getCreatedAt());
-        if (message.getUser().getName() != null)
-            holder.message.setText(message.getMessage());
-        holder.ivImgSent.setImageUrl(message.getImage(), MyApplication.getInstance().getImageLoader());
 
+        int type = message.getType();
 
-        try {
-            Uri videoURI = Uri.parse(message.getVideoUrl());
+        if (type == Message.TEXT) {
+            holder.tvTextMsg.setVisibility(View.VISIBLE);
+            holder.ivImgSent.setVisibility(View.GONE);
+            holder.videoSent.setVisibility(View.GONE);
 
-            holder.videoSent.setVideoURI(videoURI);
-            holder.videoSent.setBackgroundResource(R.drawable.black);
+            holder.tvTextMsg.setText(message.getContent());
+        } else if (type == Message.IMAGE) {
+            holder.tvTextMsg.setVisibility(View.GONE);
+            holder.ivImgSent.setVisibility(View.VISIBLE);
+            holder.videoSent.setVisibility(View.GONE);
+
+            holder.ivImgSent.setImageUrl(message.getContent(), MyApplication.getInstance().getImageLoader());
+        } else if (type == Message.VIDEO) {
+            holder.tvTextMsg.setVisibility(View.GONE);
             holder.ivImgSent.setVisibility(View.GONE);
             holder.videoSent.setVisibility(View.VISIBLE);
+
+            try {
+                // Start the MediaController
+                MediaController mediacontroller = new MediaController(mContext);
+                mediacontroller.setAnchorView(holder.videoSent);
+
+                // Get the URL from String VideoURL
+                Uri video = Uri.parse(message.getContent());
+                holder.videoSent.setMediaController(mediacontroller);
+                holder.videoSent.setVideoURI(video);
+
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+
+            holder.videoSent.requestFocus();
             holder.videoSent.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
+                // Close the progress bar and play the video
                 public void onPrepared(MediaPlayer mp) {
-
-                    System.out.println("getting ready");
-
-                    holder.videoSent.setBackgroundResource(0);
-
-                    mp.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
-                        @Override
-                        public void onBufferingUpdate(MediaPlayer mp, int percent) {
-
-                            int a = 0;
-                            if (percent > a) {
-                                a = percent;
-                            }
-                            if (mp.isPlaying()) {
-
-                                holder.loadingProgressBar.setVisibility(View.GONE);
-                            } else {
-                                holder.loadingProgressBar.setVisibility(View.VISIBLE);
-                            }
-                            holder.videoSent.start();
-                        }
-                    });
-
+//                    pDialog.dismiss();
+                    holder.videoSent.start();
                 }
             });
-
-            MediaController vidControl = new MediaController(this.mContext);
-            vidControl.setAnchorView(holder.videoSent);
-            holder.videoSent.setMediaController(vidControl);
-            holder.videoSent.getBufferPercentage();
-
-
-        } catch (Exception e) {
-
-            System.out.println("video exception" + e.getLocalizedMessage());
         }
     }
 

@@ -66,7 +66,7 @@ public class MyGcmPushReceiver extends GcmListenerService {
         if (flag == null)
             return;
 
-        if(MyApplication.getInstance().getPrefManager().getUser() == null){
+        if (MyApplication.getInstance().getPrefManager().getUser() == null) {
             // user is not logged in, skipping push notification
             Log.e(TAG, "user is not logged in, skipping push notification");
             return;
@@ -93,20 +93,14 @@ public class MyGcmPushReceiver extends GcmListenerService {
     /**
      * Processing chat room push message
      * this message will be broadcasts to all the activities registered
-     * */
+     */
     private void processChatRoomPush(String title, boolean isBackground, String data) {
         if (!isBackground) {
 
             try {
                 JSONObject datObj = new JSONObject(data);
 
-                String friendId = datObj.getString(Constants.EXTRA_KEY_FRIEND_ID);
-
-                JSONObject mObj = datObj.getJSONObject("message");
-                Message message = new Message();
-                message.setMessage(mObj.getString("message"));
-                message.setId(mObj.getString("message_id"));
-                message.setCreatedAt(mObj.getString("created_at"));
+                String friendId = datObj.getString("$peer_id");
 
                 JSONObject uObj = datObj.getJSONObject("user");
 
@@ -118,11 +112,27 @@ public class MyGcmPushReceiver extends GcmListenerService {
                     return;
                 }
 
-                User user = new User();
-                user.setId(uObj.getString("user_id"));
-                user.setEmail(uObj.getString("email"));
-                user.setName(uObj.getString("name"));
-                message.setUser(user);
+                String userId = uObj.getString("user_id");
+                String name = uObj.getString("name");
+                String email = uObj.getString("email");
+                User user = new User(userId, name, email);
+
+                Message message = null;
+                JSONObject msgObj = datObj.getJSONObject("message");
+
+                boolean error = msgObj.getBoolean("error");
+                if (!error) {
+                    String msgId = msgObj.getString("message_id");
+                    String content = msgObj.getString("content");
+                    String createdAt = msgObj.getString("created_at");
+
+                    // TODO - Make one single API to upload video/image or text
+                    // For now hard coding it to Type TEXT
+                    message = new Message(msgId, content, createdAt, user, Message.TEXT);
+                } else {
+                    // TODO - what if message is returns in error=true
+                    message = new Message(null, null, null, user, Message.TEXT);
+                }
 
                 // verifying whether the app is in background or foreground
                 if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
@@ -142,7 +152,7 @@ public class MyGcmPushReceiver extends GcmListenerService {
                     // app is in background. show the message in notification try
                     Intent resultIntent = new Intent(getApplicationContext(), ChatRoomActivity.class);
                     resultIntent.putExtra(Constants.EXTRA_KEY_FRIEND_ID, friendId);
-                    showNotificationMessage(getApplicationContext(), title, user.getName() + " : " + message.getMessage(), message.getCreatedAt(), resultIntent);
+                    showNotificationMessage(getApplicationContext(), title, user.getName() + " : " + message.getContent(), message.getCreatedAt(), resultIntent);
                 }
 
             } catch (JSONException e) {
@@ -159,7 +169,7 @@ public class MyGcmPushReceiver extends GcmListenerService {
     /**
      * Processing user specific push message
      * It will be displayed with / without nivUser in push notification tray
-     * */
+     */
     private void processUserMessage(String title, boolean isBackground, String data) {
         if (!isBackground) {
 
@@ -168,18 +178,29 @@ public class MyGcmPushReceiver extends GcmListenerService {
 
                 String imageUrl = datObj.getString("image");
 
-                JSONObject mObj = datObj.getJSONObject("message");
-                Message message = new Message();
-                message.setMessage(mObj.getString("message"));
-                message.setId(mObj.getString("message_id"));
-                message.setCreatedAt(mObj.getString("created_at"));
-
                 JSONObject uObj = datObj.getJSONObject("user");
-                User user = new User();
-                user.setId(uObj.getString("user_id"));
-                user.setEmail(uObj.getString("email"));
-                user.setName(uObj.getString("name"));
-                message.setUser(user);
+
+                String userId = uObj.getString("user_id");
+                String name = uObj.getString("name");
+                String email = uObj.getString("email");
+                User user = new User(userId, name, email);
+
+                Message message = null;
+                JSONObject msgObj = datObj.getJSONObject("message");
+
+                boolean error = msgObj.getBoolean("error");
+                if (!error) {
+                    String msgId = msgObj.getString("message_id");
+                    // TODO - not sure to be created with image or not
+                    String content = msgObj.getString("content");
+                    String createdAt = msgObj.getString("created_at");
+
+                    // TODO - Make one single API to upload video/image or text
+                    message = new Message(msgId, imageUrl, createdAt, user, Message.IMAGE);
+                } else {
+                    // TODO - what if message is returns in error=true
+                    message = new Message(null, null, null, user, Message.IMAGE);
+                }
 
                 // verifying whether the app is in background or foreground
                 if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
@@ -200,11 +221,11 @@ public class MyGcmPushReceiver extends GcmListenerService {
 
                     // check for push notification nivUser attachment
                     if (TextUtils.isEmpty(imageUrl)) {
-                        showNotificationMessage(getApplicationContext(), title, user.getName() + " : " + message.getMessage(), message.getCreatedAt(), resultIntent);
+                        showNotificationMessage(getApplicationContext(), title, user.getName() + " : " + message.getContent(), message.getCreatedAt(), resultIntent);
                     } else {
                         // push notification contains nivUser
                         // show it with the nivUser
-                        showNotificationMessageWithBigImage(getApplicationContext(), title, message.getMessage(), message.getCreatedAt(), resultIntent, imageUrl);
+                        showNotificationMessageWithBigImage(getApplicationContext(), title, message.getContent(), message.getCreatedAt(), resultIntent, imageUrl);
                     }
                 }
             } catch (JSONException e) {
@@ -220,7 +241,7 @@ public class MyGcmPushReceiver extends GcmListenerService {
 
     /**
      * Showing notification with text only
-     * */
+     */
     private void showNotificationMessage(Context context, String title, String message, String timeStamp, Intent intent) {
         notificationUtils = new NotificationUtils(context);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -229,7 +250,7 @@ public class MyGcmPushReceiver extends GcmListenerService {
 
     /**
      * Showing notification with text and nivUser
-     * */
+     */
     private void showNotificationMessageWithBigImage(Context context, String title, String message, String timeStamp, Intent intent, String imageUrl) {
         notificationUtils = new NotificationUtils(context);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
