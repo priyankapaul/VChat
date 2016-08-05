@@ -38,7 +38,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTextMsg, timestamp;
+        TextView tvTextMsg, tvTimeStamp;
         NetworkImageView ivImgSent;
         VideoView videoSent;
         public ProgressBar loadingProgressBar;
@@ -46,7 +46,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
         public ViewHolder(View view) {
             super(view);
             tvTextMsg = (TextView) view.findViewById(R.id.tv_text_msg);
-            timestamp = (TextView) view.findViewById(R.id.timestamp);
+            tvTimeStamp = (TextView) view.findViewById(R.id.timestamp);
             ivImgSent = (NetworkImageView) view.findViewById(R.id.niv_image);
             videoSent = (VideoView) view.findViewById(R.id.vv_video);
 
@@ -65,25 +65,23 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View itemView;
-        itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_item_other, parent, false);
+        View itemView;// = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_item_other, parent, false);
 
         // view type is to identify where to render the chat message
         // left or right
-      /*  if (viewType == SELF) {
+        if (viewType == SELF) {
             // self message
             itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_item_self, parent, false);
         } else {
             // others message
             itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_item_other, parent, false);
-        }*/
+        }
 
         ViewHolder viewHolder = new ViewHolder(itemView);
         return viewHolder;
         //  return new ViewHolder(itemView);
     }
 
-/*
     @Override
     public int getItemViewType(int position) {
         Message message = messageArrayList.get(position);
@@ -91,9 +89,8 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
             return SELF;
         }
 
-    return position;
-    }*/
-
+        return position;
+    }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
@@ -101,6 +98,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
 
         int type = message.getType();
 
+        holder.tvTimeStamp.setText(message.getUser().getName() + ", " + getTimeStamp(message.getCreatedAt()));
         if (type == Message.TEXT) {
             holder.tvTextMsg.setVisibility(View.VISIBLE);
             holder.ivImgSent.setVisibility(View.GONE);

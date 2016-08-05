@@ -1,35 +1,51 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="right"
-    android:orientation="horizontal"
-    android:paddingBottom="5dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:paddingLeft="16dp"
-    android:paddingRight="16dp">
+    android:paddingRight="16dp"
+    android:paddingTop="5dp">
 
-    <TextView
-        android:id="@+id/message"
+    <FrameLayout
+        android:id="@+id/frame_msg_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
-        android:background="@drawable/bg_bubble_gray"
-        android:textIsSelectable="true"
-        android:textSize="14dp" />
+        android:layout_marginRight="10dp">
+
+        <TextView
+            android:id="@+id/tv_text_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_bubble_gray"
+            android:textIsSelectable="true"
+            android:textSize="14dp" />
+
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/niv_image"
+            android:layout_width="300dp"
+            android:layout_height="200dp"
+            android:layout_alignParentRight="true" />
+
+        <VideoView
+            android:id="@+id/vv_video"
+            android:layout_width="300dp"
+            android:layout_height="200dp"
+            android:layout_alignParentRight="true"
+            android:paddingTop="20dp" />
+    </FrameLayout>
+
 
     <TextView
         android:id="@+id/timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@id/message"
-        android:layout_below="@id/message"
+        android:layout_alignParentRight="true"
+        android:layout_alignRight="@id/frame_msg_content"
+        android:layout_below="@id/frame_msg_content"
         android:layout_marginBottom="25dp"
-        android:padding="10dp"
+        android:paddingLeft="10dp"
+        android:paddingTop="6dp"
         android:textSize="10dp" />
-
-    <com.android.volley.toolbox.NetworkImageView
-        android:id="@+id/image_sent"
-        android:layout_width="250dp"
-        android:layout_height="250dp" />
 
 </RelativeLayout>

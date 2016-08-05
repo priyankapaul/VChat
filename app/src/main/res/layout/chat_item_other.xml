@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -6,38 +6,46 @@
     android:paddingRight="16dp"
     android:paddingTop="5dp">
 
-    <TextView
-        android:id="@+id/tv_text_msg"
+
+    <FrameLayout
+        android:id="@+id/frame_msg_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_marginLeft="10dp"
-        android:background="@drawable/bg_bubble_white"
-        android:textIsSelectable="true"
-        android:textSize="14dp" />
+        android:layout_marginLeft="10dp">
+
+        <TextView
+            android:id="@+id/tv_text_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_bubble_white"
+            android:textIsSelectable="true"
+            android:textSize="14dp" />
+
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/niv_image"
+            android:layout_width="300dp"
+            android:layout_height="200dp"
+            android:layout_alignParentRight="true" />
+
+        <VideoView
+            android:id="@+id/vv_video"
+            android:layout_width="300dp"
+            android:layout_height="200dp"
+            android:layout_alignParentRight="true"
+            android:paddingTop="20dp" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/tv_text_msg"
+        android:layout_below="@id/frame_msg_content"
         android:layout_marginBottom="25dp"
         android:layout_marginLeft="10dp"
         android:paddingLeft="10dp"
         android:paddingTop="6dp"
-        android:textSize="10dp"
-        android:visibility="gone" />
+        android:textSize="10dp" />
 
-    <com.android.volley.toolbox.NetworkImageView
-        android:id="@+id/niv_image"
-        android:layout_width="300dp"
-        android:layout_height="200dp" />
-
-    <VideoView
-        android:id="@+id/vv_video"
-        android:layout_width="300dp"
-        android:layout_height="200dp"
-        android:paddingTop="20dp" />
-
-</FrameLayout>
+</RelativeLayout>
