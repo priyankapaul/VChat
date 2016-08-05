@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -24,8 +25,13 @@ import android.widget.Spinner;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.Profile;
+import com.facebook.login.LoginResult;
 import com.iwebnext.vchatt.R;
-import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.request.SignUpRequest;
 import com.iwebnext.vchatt.utils.Constants;
 import com.iwebnext.vchatt.utils.EndPoints;
@@ -45,6 +51,7 @@ public class SignUpActivity extends AppCompatActivity {
     Spinner spProfession;
     EditText etMedicalLicenseNo;
     EditText etEmail;
+    private EditText etName, etState;
 
     ProgressDialog progressDialog;
     private Bitmap bitmap;
@@ -57,12 +64,16 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        Bundle bundle = getIntent().getExtras();
+        String fbEmail = bundle.getString("email");
+        etEmail.setText(fbEmail);
+
         spProfession = (Spinner) findViewById(R.id.spinner);
-        final EditText etName = (EditText) findViewById(R.id.input_name);
+        etName = (EditText) findViewById(R.id.input_name);
         etEmail = (EditText) findViewById(R.id.input_email);
         final EditText etPassword = (EditText) findViewById(R.id.input_password);
         etMedicalLicenseNo = (EditText) findViewById(R.id.input_medical_license_number);
-        final EditText etState = (EditText) findViewById(R.id.input_state);
+        etState = (EditText) findViewById(R.id.input_state);
         final Button bRegister = (Button) findViewById(R.id.btn_create_account);
 
         Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.user_profile);
@@ -256,4 +267,60 @@ public class SignUpActivity extends AppCompatActivity {
                     .show();
         }
     }
+
+    private FacebookCallback<LoginResult> callback = new FacebookCallback<LoginResult>() {
+
+        @Override
+        public void onSuccess(LoginResult loginResult) {
+            String accessToken = loginResult.getAccessToken().getToken();
+            Log.i("accessToken", accessToken);
+
+            // AccessToken accessToken = loginResult.getAccessToken();
+            // System.out.println("access token"+accessToken);
+
+
+            Profile profile = Profile.getCurrentProfile();
+
+            GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+
+
+                @Override
+                public void onCompleted(JSONObject object, GraphResponse response) {
+                    Log.i("LoginActivity", response.toString());
+                    // Get facebook data from login
+                    //  Bundle bFacebookData = getFacebookData(object);
+                    Profile profile = Profile.getCurrentProfile();
+
+                    try {
+
+                        etEmail.setText(object.getString("email"));
+                        etName.setText(object.getString("name"));
+                        etState.setText(object.getString("location"));
+
+
+                        // String inputEmail = object.getString("email");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    //saveNewUser();
+
+                }
+            });
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "email,name,location"); // Parámetros que pedimos a facebook
+            request.setParameters(parameters);
+            request.executeAsync();
+        }
+
+
+        @Override
+        public void onCancel() {
+
+        }
+
+        @Override
+        public void onError(FacebookException e) {
+
+        }
+    };
 }

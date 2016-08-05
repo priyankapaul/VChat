@@ -37,7 +37,7 @@
             android:orientation="vertical"
             android:paddingLeft="20dp"
             android:paddingTop="10dp"
-            android:paddingBottom="10dp"
+            android:paddingBottom="25dp"
             android:paddingRight="20dp"
             android:background="#00F0F8FF"
             android:weightSum="1">
@@ -73,7 +73,7 @@
 
 
             <Button android:id="@+id/btn_enter"
-                android:layout_width="fill_parent"
+                android:layout_width="300dp"
                 android:layout_height="33dp"
                 android:text="SignIn"
                 android:textSize="15dp"
@@ -84,20 +84,19 @@
             <com.facebook.login.widget.LoginButton
                 android:id="@+id/login_fb_button"
                 android:background="@drawable/rounded_fb_button"
-                android:layout_marginTop="8dp"
-                android:layout_width="219dp"
+                android:layout_marginTop="18dp"
+                android:layout_width="298dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.17" />
 
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/login_gplus_button"
-                android:layout_width="222dp"
+                android:layout_width="307dp"
                 android:layout_height="35dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="5dp"
                 android:layout_below="@+id/login_fb_button"
                 android:layout_gravity="center_horizontal" />
-
 
 
             <TextView
@@ -106,8 +105,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="left"
-                android:paddingTop="25dp"
-                android:paddingBottom="20dp"
+                android:paddingTop="15dp"
+                android:paddingBottom="10dp"
                 android:text="sign up for vchat"
                 android:layout_gravity="center_horizontal"
                 android:textColor="#ffff" />
@@ -125,7 +124,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:paddingTop="20dp"
+                android:paddingTop="10dp"
                 android:text="forgot password"
                 android:textColor="#ffff"
                 android:layout_gravity="center_horizontal"/>

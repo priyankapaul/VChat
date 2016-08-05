@@ -76,7 +76,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         toolbar.setTitle(title);
         setSupportActionBar(toolbar);
 
-        inputMessage = (EditText) findViewById(R.id.tv_text_msg);
+        inputMessage = (EditText) findViewById(R.id.message);
         btnSend = (Button) findViewById(R.id.btn_send);
 
         rvChatThread = (RecyclerView) findViewById(R.id.recycler_view);

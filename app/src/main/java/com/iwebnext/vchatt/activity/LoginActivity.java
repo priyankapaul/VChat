@@ -2,6 +2,7 @@ package com.iwebnext.vchatt.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -31,6 +32,8 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
@@ -60,8 +63,11 @@ import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
+    private static final int TIME_OUT = 3000;
+    private SharedPreferences mPrefs;
     private String TAG = LoginActivity.class.getSimpleName();
-    private EditText inputPassword, inputEmail;
+    private EditText inputPassword;
+    private EditText inputEmail;
     private Button btnEnter;
     private TextView tvSignUp, tvForgetPassword;
     private DotProgressBar progressBar;
@@ -71,6 +77,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private ProfileTracker profileTracker;
     private GoogleSignInOptions gso;
     private SignInButton signInButton;
+
     //google api client
     private GoogleApiClient mGoogleApiClient;
 
@@ -113,6 +120,22 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         setContentView(R.layout.activity_login);
 
+
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(
+                    "com.iwebnext.vchatt",
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -145,7 +168,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         loginButton.setReadPermissions("user_friends");
         loginButton.setReadPermissions("email");
-        // loginButton.setFragment(this);
         loginButton.registerCallback(callbackManager, callback);
 
 
@@ -185,7 +207,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         signInButton.setOnClickListener(new View.OnClickListener() {
 
-
             @Override
             public void onClick(View v) {
                 if (v == signInButton) {
@@ -196,7 +217,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
 
         });
-
     }
 
     private void signIn() {
@@ -207,8 +227,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-
-    //After the signing we are calling this function
     private void handleSignInResult(GoogleSignInResult result) {
         if (result == null)
             return;
@@ -436,9 +454,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private void displayMessage(Profile profile) {
         if (profile != null) {
             //extra
-            inputEmail.setText(profile.getName());
-            inputPassword.setText(profile.getName());
-
         }
     }
 
@@ -461,17 +476,54 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         @Override
         public void onSuccess(LoginResult loginResult) {
-            AccessToken accessToken = loginResult.getAccessToken();
+            Intent myIntent = new Intent(LoginActivity.this, SignUpActivity.class);
+
+            startActivity(myIntent);
+
+
+            String accessToken = loginResult.getAccessToken().getToken();
+            Log.i("accessToken", accessToken);
+
+            // AccessToken accessToken = loginResult.getAccessToken();
+            // System.out.println("access token"+accessToken);
+
+
             Profile profile = Profile.getCurrentProfile();
 
             displayMessage(profile);
-//            info.setText(
-//                    "User ID: "
-//                            + loginResult.getAccessToken().getUserId()
-//                            + "\n" +
-//                            "Auth Token: "
-//                            + loginResult.getAccessToken().getToken()
-//            );
+            GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+
+
+                @Override
+                public void onCompleted(JSONObject object, GraphResponse response) {
+                    Log.i("LoginActivity", response.toString());
+                    // Get facebook data from login
+                    //  Bundle bFacebookData = getFacebookData(object);
+                    Profile profile = Profile.getCurrentProfile();
+
+                    try {
+                        Intent i = new Intent(LoginActivity.this, SignUpActivity.class);
+                        String Email = object.getString("email");
+                        Bundle bundle = new Bundle();
+                        bundle.putString("email", Email);
+                        i.putExtras(bundle);
+
+
+                        inputEmail.setText(object.getString("email"));
+                        inputPassword.setText(object.getString("password"));
+
+                        // String inputEmail = object.getString("email");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    //saveNewUser();
+
+                }
+            });
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "email"); // Parámetros que pedimos a facebook
+            request.setParameters(parameters);
+            request.executeAsync();
         }
 
         @Override
