@@ -27,7 +27,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.iwebnext.vchatt.R;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.utils.Constants;
 import com.iwebnext.vchatt.utils.EndPoints;
 
@@ -124,7 +124,7 @@ public class AttachPictureActivity extends AppCompatActivity {
                 }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                final String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+                final String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
 
                 //Getting Image Name
                 String name = editTextName.getText().toString().trim();

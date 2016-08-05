@@ -28,7 +28,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.android.gcm.GCMRegistrar;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.adapter.SearchAllUserAdapter;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.helper.SimpleDividerItemDecoration;
 import com.iwebnext.vchatt.model.User;
 import com.iwebnext.vchatt.utils.Constants;
@@ -198,7 +198,7 @@ public class SearchUsersFragment extends Fragment {
         });
 
         //Adding request to request queue
-        MyApplication.getInstance().addToRequestQueue(strReq);
+        BaseApplication.getInstance().addToRequestQueue(strReq);
     }
 /*
     @Override

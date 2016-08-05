@@ -31,7 +31,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.adapter.ChatRoomThreadAdapter;
 import com.iwebnext.vchatt.app.Config;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.gcm.NotificationUtils;
 import com.iwebnext.vchatt.model.Message;
 import com.iwebnext.vchatt.model.User;
@@ -84,7 +84,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         messageArrayList = new ArrayList<>();
 
         // self user id is to identify the message owner
-        String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+        String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
 
         mAdapter = new ChatRoomThreadAdapter(this, messageArrayList, selfUserId);
 
@@ -257,7 +257,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("user_id", MyApplication.getInstance().getPrefManager().getUser().getId());
+                params.put("user_id", BaseApplication.getInstance().getPrefManager().getUser().getId());
                 params.put("peer_id", friendId);
                 params.put("message", message);
 
@@ -278,7 +278,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         strReq.setRetryPolicy(policy);
 
         //Adding request to request queue
-        MyApplication.getInstance().addToRequestQueue(strReq);
+        BaseApplication.getInstance().addToRequestQueue(strReq);
     }
 
     /**
@@ -286,7 +286,7 @@ public class ChatRoomActivity extends AppCompatActivity {
      */
     private void fetchChatThread() {
 
-        String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+        String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
         String endPoint = EndPoints.MESSAGES.replace("_ID_", friendId);
         endPoint = endPoint.replace("_MY_", selfUserId);
         Log.e(TAG, "endPoint: " + endPoint);
@@ -349,7 +349,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         });
         //Adding request to request queue
-        MyApplication.getInstance().addToRequestQueue(strReq);
+        BaseApplication.getInstance().addToRequestQueue(strReq);
     }
 
 }

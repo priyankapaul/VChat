@@ -21,7 +21,7 @@ import android.util.Patterns;
 
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.app.Config;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,10 +101,10 @@ public class NotificationUtils {
 
         if(Config.appendNotificationMessages){
             // store the notification in shared pref first
-            MyApplication.getInstance().getPrefManager().addNotification(message);
+            BaseApplication.getInstance().getPrefManager().addNotification(message);
 
             // get the notifications from shared preferences
-            String oldNotification = MyApplication.getInstance().getPrefManager().getNotifications();
+            String oldNotification = BaseApplication.getInstance().getPrefManager().getNotifications();
 
             List<String> messages = Arrays.asList(oldNotification.split("\\|"));
 
@@ -178,8 +178,8 @@ public class NotificationUtils {
     public void playNotificationSound() {
         try {
             Uri alarmSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
-                    + "://" + MyApplication.getInstance().getApplicationContext().getPackageName() + "/raw/notification");
-            Ringtone r = RingtoneManager.getRingtone(MyApplication.getInstance().getApplicationContext(), alarmSound);
+                    + "://" + BaseApplication.getInstance().getApplicationContext().getPackageName() + "/raw/notification");
+            Ringtone r = RingtoneManager.getRingtone(BaseApplication.getInstance().getApplicationContext(), alarmSound);
             r.play();
         } catch (Exception e) {
             e.printStackTrace();
@@ -216,7 +216,7 @@ public class NotificationUtils {
 
     // Clears notification tray messages
     public static void clearNotifications() {
-        NotificationManager notificationManager = (NotificationManager) MyApplication.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) BaseApplication.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
     }
 

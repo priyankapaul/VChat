@@ -19,7 +19,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.adapter.FriendRequestAdapter;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.FriendRequest;
 import com.iwebnext.vchatt.request.FriendRequestAccept;
 import com.iwebnext.vchatt.request.FriendRequestDecline;
@@ -154,7 +154,7 @@ public class FriendRequestActivity extends AppCompatActivity {
      * fetching the friend request list
      */
     private void fetchFriendRequestList() {
-        final String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+        final String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
         String endPoint = EndPoints.FRIEND_REQUEST.replace("_ID_", selfUserId);
 
         StringRequest strReq = new StringRequest(Request.Method.GET,
@@ -193,6 +193,6 @@ public class FriendRequestActivity extends AppCompatActivity {
         });
 
         //Adding request to request queue
-        MyApplication.getInstance().addToRequestQueue(strReq);
+        BaseApplication.getInstance().addToRequestQueue(strReq);
     }
 }

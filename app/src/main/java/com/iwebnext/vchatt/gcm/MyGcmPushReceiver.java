@@ -28,7 +28,7 @@ import com.google.android.gms.gcm.GcmListenerService;
 import com.iwebnext.vchatt.activity.ChatRoomActivity;
 import com.iwebnext.vchatt.activity.MainActivity;
 import com.iwebnext.vchatt.app.Config;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.Message;
 import com.iwebnext.vchatt.model.User;
 import com.iwebnext.vchatt.utils.Constants;
@@ -66,7 +66,7 @@ public class MyGcmPushReceiver extends GcmListenerService {
         if (flag == null)
             return;
 
-        if (MyApplication.getInstance().getPrefManager().getUser() == null) {
+        if (BaseApplication.getInstance().getPrefManager().getUser() == null) {
             // user is not logged in, skipping push notification
             Log.e(TAG, "user is not logged in, skipping push notification");
             return;
@@ -107,7 +107,7 @@ public class MyGcmPushReceiver extends GcmListenerService {
                 // skip the message if the message belongs to same user as
                 // the user would be having the same message when he was sending
                 // but it might differs in your scenario
-                if (uObj.getString("user_id").equals(MyApplication.getInstance().getPrefManager().getUser().getId())) {
+                if (uObj.getString("user_id").equals(BaseApplication.getInstance().getPrefManager().getUser().getId())) {
                     Log.e(TAG, "Skipping the push message as it belongs to same user");
                     return;
                 }

@@ -33,7 +33,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.iwebnext.vchatt.R;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.fragment.HomeFragment;
 import com.iwebnext.vchatt.fragment.ProfileFragment;
 import com.iwebnext.vchatt.utils.EndPoints;
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         navName = (TextView) hView.findViewById(R.id.nav_name);
 
 
-        if (MyApplication.getInstance().getPrefManager().getUser() == null) {
+        if (BaseApplication.getInstance().getPrefManager().getUser() == null) {
             launchLoginActivity();
         }
 
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (menuItem.getItemId()) {
             case R.id.action_logout:
-                MyApplication.getInstance().logout();
+                BaseApplication.getInstance().logout();
                 break;
             case R.id.action_search:
                 return true;
@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void fetchNavDetails() {
 
-        final String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+        final String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
         String endPoint = EndPoints.NAV_DRAWER.replace("_ID_", selfUserId);
 
         StringRequest strReq = new StringRequest(Request.Method.GET,
@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Adding request to request queue
-        MyApplication.getInstance().addToRequestQueue(strReq);
+        BaseApplication.getInstance().addToRequestQueue(strReq);
     }
 
     public class DownloadImage extends AsyncTask<String, Integer, Drawable> {

@@ -14,14 +14,14 @@ import com.iwebnext.vchatt.activity.LoginActivity;
 import com.iwebnext.vchatt.helper.MyPreferenceManager;
 
 
-public class MyApplication extends Application {
+public class BaseApplication extends Application {
 
-    public static final String TAG = MyApplication.class
+    public static final String TAG = BaseApplication.class
             .getSimpleName();
 
     private RequestQueue mRequestQueue;
 
-    private static MyApplication mInstance;
+    private static BaseApplication mInstance;
 
     private MyPreferenceManager pref;
 
@@ -33,7 +33,7 @@ public class MyApplication extends Application {
         mInstance = this;
     }
 
-    public static synchronized MyApplication getInstance() {
+    public static synchronized BaseApplication getInstance() {
         return mInstance;
     }
 

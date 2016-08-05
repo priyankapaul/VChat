@@ -2,13 +2,13 @@ package com.iwebnext.vchatt.request;
 
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class FriendRequestSent extends StringRequest {
-    final static String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+    final static String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
 
 
     private static final String REGISTER_REQUEST_URL = "http://inextwebs.com/gcm_chat/include/friend_request_sent.php";

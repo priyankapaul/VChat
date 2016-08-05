@@ -32,7 +32,7 @@ import com.iwebnext.vchatt.activity.MainActivity;
 import com.iwebnext.vchatt.activity.SearchUsersActivity;
 import com.iwebnext.vchatt.adapter.FriendListAdapter;
 import com.iwebnext.vchatt.app.Config;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.gcm.GcmIntentService;
 import com.iwebnext.vchatt.gcm.NotificationUtils;
 import com.iwebnext.vchatt.helper.SimpleDividerItemDecoration;
@@ -254,7 +254,7 @@ public class HomeFragment extends Fragment implements MainActivity.SearchQueryLi
      */
     private void fetchFriendList() {
 
-        final String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+        final String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
         String endPoint = EndPoints.FRIEND_LIST.replace("_ID_", selfUserId);
 
         StringRequest strReq = new StringRequest(Request.Method.GET,
@@ -269,27 +269,27 @@ public class HomeFragment extends Fragment implements MainActivity.SearchQueryLi
 
                     // check for error flag
                     if (obj.getBoolean("error") == false) {
-                        JSONArray chatRoomsArray = obj.getJSONArray("friend_list");
-                        for (int i = 0; i < chatRoomsArray.length(); i++) {
-                            JSONObject chatRoomsObj = (JSONObject) chatRoomsArray.get(i);
-                            String idd = chatRoomsObj.getString("user_id");
+                        JSONArray friendObjArr = obj.getJSONArray("friend_list");
+                        for (int i = 0; i < friendObjArr.length(); i++) {
+                            JSONObject friendObj = (JSONObject) friendObjArr.get(i);
+                            String idd = friendObj.getString("user_id");
                             if (idd != selfUserId) {
                                 Friend friend = new Friend();
 
-                                friend.setId(chatRoomsObj.getString("user_id"));
-                                friend.setName(chatRoomsObj.getString("name"));
-                                friend.setImage(chatRoomsObj.getString("image"));
+                                friend.setId(friendObj.getString("user_id"));
+                                friend.setName(friendObj.getString("name"));
+                                friend.setImage(friendObj.getString("image"));
                                 friend.setLastMessage("");
                                 friend.setUnreadCount(0);
-                                friend.setTimestamp(chatRoomsObj.getString("created_at"));
+                                friend.setTimestamp(friendObj.getString("created_at"));
                                 friendsArrayList.add(friend);
                                 backupFriendsArrayList.add(friend);
                             }
                         }
 
                     } else {
-                        // error in fetching chat rooms
-                        Toast.makeText(getActivity(), "" + obj.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();
+                        // error in fetching friend list
+                        Toast.makeText(getActivity(), "" + obj.getString("message"), Toast.LENGTH_LONG).show();
                     }
 
                 } catch (JSONException e) {
@@ -308,7 +308,7 @@ public class HomeFragment extends Fragment implements MainActivity.SearchQueryLi
         });
 
         //Adding request to request queue
-        MyApplication.getInstance().addToRequestQueue(strReq);
+        BaseApplication.getInstance().addToRequestQueue(strReq);
     }
 
     // subscribing to global topic

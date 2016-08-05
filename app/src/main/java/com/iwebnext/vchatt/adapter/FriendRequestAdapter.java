@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.activity.CircularNetworkImageView;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.FriendRequest;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class FriendRequestAdapter extends RecyclerView.Adapter<FriendRequestAdap
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         FriendRequest friendRequest = friendRequests.get(position);
-        holder.networkImageView.setImageUrl(friendRequest.getImage(), MyApplication.getInstance().getImageLoader());
+        holder.networkImageView.setImageUrl(friendRequest.getImage(), BaseApplication.getInstance().getImageLoader());
         holder.textViewName.setText(friendRequest.getName());
      //   holder.tvfriendRequestSent.setEnabled(friendRequest.getFriendRequestSent());
 

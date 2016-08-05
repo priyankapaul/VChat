@@ -18,7 +18,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.app.Config;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.User;
 import com.iwebnext.vchatt.utils.EndPoints;
 
@@ -95,7 +95,7 @@ public class GcmIntentService extends IntentService {
     private void sendRegistrationToServer(final String token) {
 
         // checking for valid login session
-        User user = MyApplication.getInstance().getPrefManager().getUser();
+        User user = BaseApplication.getInstance().getPrefManager().getUser();
         if (user == null) {
             // TODO
             // user not found, redirecting him to login screen
@@ -151,18 +151,18 @@ public class GcmIntentService extends IntentService {
         };
 
         //Adding request to request queue
-        MyApplication.getInstance().addToRequestQueue(strReq);
+        BaseApplication.getInstance().addToRequestQueue(strReq);
     }
 
     /**
      * Subscribe to a topic
      */
     public static void subscribeToTopic(String topic) {
-        GcmPubSub pubSub = GcmPubSub.getInstance(MyApplication.getInstance().getApplicationContext());
-        InstanceID instanceID = InstanceID.getInstance(MyApplication.getInstance().getApplicationContext());
+        GcmPubSub pubSub = GcmPubSub.getInstance(BaseApplication.getInstance().getApplicationContext());
+        InstanceID instanceID = InstanceID.getInstance(BaseApplication.getInstance().getApplicationContext());
         String token = null;
         try {
-            token = instanceID.getToken(MyApplication.getInstance().getApplicationContext().getString(R.string.gcm_defaultSenderId),
+            token = instanceID.getToken(BaseApplication.getInstance().getApplicationContext().getString(R.string.gcm_defaultSenderId),
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             if (token != null) {
                 pubSub.subscribe(token, "/topics/" + topic, null);
@@ -172,7 +172,7 @@ public class GcmIntentService extends IntentService {
             }
         } catch (IOException e) {
             Log.e(TAG, "Topic subscribe error. Topic: " + topic + ", error: " + e.getMessage());
-            Toast.makeText(MyApplication.getInstance().getApplicationContext(), "Topic subscribe error. Topic: " + topic + ", error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(BaseApplication.getInstance().getApplicationContext(), "Topic subscribe error. Topic: " + topic + ", error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

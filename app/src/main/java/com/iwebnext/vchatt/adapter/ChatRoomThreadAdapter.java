@@ -15,7 +15,7 @@ import android.widget.VideoView;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.iwebnext.vchatt.R;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.Message;
 
 import java.text.ParseException;
@@ -112,7 +112,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
             holder.ivImgSent.setVisibility(View.VISIBLE);
             holder.videoSent.setVisibility(View.GONE);
 
-            holder.ivImgSent.setImageUrl(message.getContent(), MyApplication.getInstance().getImageLoader());
+            holder.ivImgSent.setImageUrl(message.getContent(), BaseApplication.getInstance().getImageLoader());
         } else if (type == Message.VIDEO) {
             holder.tvTextMsg.setVisibility(View.GONE);
             holder.ivImgSent.setVisibility(View.GONE);

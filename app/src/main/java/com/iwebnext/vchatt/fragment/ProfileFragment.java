@@ -26,7 +26,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -36,10 +35,12 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.activity.ImageConverter;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.Profile;
 import com.iwebnext.vchatt.request.ProfileRequest;
 import com.iwebnext.vchatt.utils.EndPoints;
+import com.iwebnext.vchatt.utils.FilePathUtils;
+import com.iwebnext.vchatt.utils.FileUploadUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,8 +53,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -65,11 +64,6 @@ public class ProfileFragment extends Fragment {
     private ArrayList<Profile> profileArrayList = new ArrayList<>();
 
     private int PICK_IMAGE_REQUEST = 1;
-    private String UPLOAD_URL = "http://inextwebs.com/gcm_chat/include/profile_photo.php";
-
-    private String KEY_IMAGE = "image";
-    //   private String KEY_ID = "USERID";
-
 
     EditText etName;
     EditText etEmail;
@@ -82,7 +76,7 @@ public class ProfileFragment extends Fragment {
     Button btnAction;
     Button btnCancel;
 
-
+    String uploadFile;
     private Bitmap bitmap;
     FrameLayout flContent;
     ImageButton fabProfile;
@@ -108,12 +102,11 @@ public class ProfileFragment extends Fragment {
         fabProfile = (ImageButton) rootView.findViewById(R.id.change_picture);
         etMedicalLicenseNo = (EditText) rootView.findViewById(R.id.et_medicalLicenseNo);
 
-        Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(),R.drawable.user_profile);
+        Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.user_profile);
         Bitmap circularBitmap = ImageConverter.getRoundedCornerBitmap(bitmap, 100);
 
         imageView = (ImageView) rootView.findViewById(R.id.show_image);
         imageView.setImageBitmap(circularBitmap);
-
 
 
         fabProfile.setOnClickListener(new View.OnClickListener() {
@@ -130,7 +123,7 @@ public class ProfileFragment extends Fragment {
         // disable all editable fields at startup
         enableAllEditableFields(false);
 
-        final String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+        final String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
         updateRow(selfUserId);
 
         btnAction = (Button) rootView.findViewById(R.id.btn_action);
@@ -234,60 +227,6 @@ public class ProfileFragment extends Fragment {
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
     }
 
-
-    private void uploadImage(Bitmap bitmap) {
-        //Converting Bitmap to String
-        final String image = getStringImage(bitmap);
-
-        //Showing the progress dialog
-        final ProgressDialog loading = ProgressDialog.show(getActivity(), "Uploading...", "Please wait...", false, false);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, UPLOAD_URL,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String s) {
-                        //Disimissing the progress dialog
-                        loading.dismiss();
-                        //Showing toast message of the response
-                        Toast.makeText(getActivity(), s, Toast.LENGTH_LONG).show();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        //Dismissing the progress dialog
-                        loading.dismiss();
-
-                        //Showing toast
-                        Toast.makeText(getActivity(), volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
-                    }
-                }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                final String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
-
-
-                //Getting Image Name
-                //  String name = editTextName.getText().toString().trim();
-
-                //Creating parameters
-                Map<String, String> params = new Hashtable<String, String>();
-
-                //Adding parameters
-                params.put(KEY_IMAGE, image);
-                params.put("user_id", selfUserId);
-
-                //returning parameters
-                return params;
-            }
-        };
-
-        //Creating a Request Queue
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-
-        //Adding request to the queue
-        requestQueue.add(stringRequest);
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -300,7 +239,9 @@ public class ProfileFragment extends Fragment {
                     //Setting the Bitmap to ImageView
                     imageView.setImageBitmap(bitmap);
 
-                    uploadImage(bitmap);
+                    uploadFile = FilePathUtils.getPath(getActivity(), filePath);
+
+                    invokeImageUploadTask();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -347,33 +288,14 @@ public class ProfileFragment extends Fragment {
 
     }
 
-
     private void cancelProgress() {
         if (dialog != null)
             dialog.cancel();
     }
 
-
-//response part
-/*
-    private void populateDummyData() {
-        ///   etName.setText("Mimi Name");
-        //   etEmail.setText("mimi@gmail.com");
-        //   etPhone.setText("12345678");
-        //   etAddress.setText("City Center");
-        final String name = etName.getText().toString();
-        final String email = etEmail.getText().toString();
-        final String password = etPassword.getText().toString();
-        final String medicalLicenseNo = etMedicalLicenseNo.getText().toString();
-        final String address = etAddress.getText().toString();
-        final String phone = etPhone.getText().toString();
-        final String profession = etProfession.getText().toString();
-       // final String nivUser = ivImage.getIm()
-       */
-
     private void fetchProfile() {
 
-        final String selfUserId = MyApplication.getInstance().getPrefManager().getUser().getId();
+        final String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
         String endPoint = EndPoints.PROFILE.replace("_ID_", selfUserId);
 
         StringRequest strReq = new StringRequest(Request.Method.GET,
@@ -387,7 +309,7 @@ public class ProfileFragment extends Fragment {
                     JSONObject obj = new JSONObject(response);
                     // check for error
 
-                    JSONArray profileArray = obj.getJSONArray("information");
+                    JSONArray profileArray = obj.getJSONArray("profile");
                     for (int i = 0; i < profileArray.length(); i++) {
                         JSONObject profileObj = (JSONObject) profileArray.get(i);
 
@@ -422,7 +344,7 @@ public class ProfileFragment extends Fragment {
         });
 
         //Adding request to request queue
-        MyApplication.getInstance().addToRequestQueue(strReq);
+        BaseApplication.getInstance().addToRequestQueue(strReq);
     }
 
     public class DownloadImage extends AsyncTask<String, Integer, Drawable> {
@@ -484,5 +406,38 @@ public class ProfileFragment extends Fragment {
 
     protected void setImage(Drawable drawable) {
         imageView.setImageDrawable(drawable);
+    }
+
+    private void invokeImageUploadTask() {
+        String userId = BaseApplication.getInstance().getPrefManager().getUser().getId();
+
+        String[] params = new String[]{uploadFile, userId, EndPoints.UPDATE_AVATAR};
+        new UploadImageAsyncTask().execute(params);
+    }
+
+    /**
+     * Inner class -- AsyncTask to upload image
+     */
+    class UploadImageAsyncTask extends AsyncTask<String, Void, Void> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(getActivity(), "Uploading...", "Please wait...", false, false);
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            FileUploadUtils.uploadImage(params[0], params[1], params[2]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v) {
+            super.onPostExecute(v);
+            progressDialog.dismiss();
+        }
     }
 }

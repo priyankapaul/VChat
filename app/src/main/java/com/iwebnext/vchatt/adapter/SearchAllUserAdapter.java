@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.activity.CircularNetworkImageView;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.User;
 
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class SearchAllUserAdapter extends RecyclerView.Adapter<SearchAllUserAdap
         holder.userName.setText(User.getName());
         holder.userId.setText(User.getId());
 
-        holder.nivUser.setImageUrl(User.getImage(), MyApplication.getInstance().getImageLoader());
+        holder.nivUser.setImageUrl(User.getImage(), BaseApplication.getInstance().getImageLoader());
     }
 
     @Override

@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.activity.CircularNetworkImageView;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.Friend;
 
 import java.text.ParseException;
@@ -61,7 +61,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
     public void onBindViewHolder(ViewHolder holder, int position) {
         Friend friend = friendArrayList.get(position);
         holder.name.setText(friend.getName());
-        holder.image.setImageUrl(friend.getImage(), MyApplication.getInstance().getImageLoader());
+        holder.image.setImageUrl(friend.getImage(), BaseApplication.getInstance().getImageLoader());
       //  holder.image.setImageBitmap(friend.getImage());
 
 

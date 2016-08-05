@@ -24,7 +24,6 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.StringRequest;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
@@ -46,7 +45,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.iwebnext.vchatt.R;
-import com.iwebnext.vchatt.app.MyApplication;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.User;
 import com.iwebnext.vchatt.utils.Constants;
 import com.iwebnext.vchatt.utils.EndPoints;
@@ -107,7 +106,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
          * Check for login session. It user is already logged in
          * redirect him to main activity
          * */
-        if (MyApplication.getInstance().getPrefManager().getUser() != null) {
+        if (BaseApplication.getInstance().getPrefManager().getUser() != null) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
         }
@@ -199,6 +198,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         });
 
     }
+
     private void signIn() {
         //Creating an intent
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
@@ -208,9 +208,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
 
-
     //After the signing we are calling this function
     private void handleSignInResult(GoogleSignInResult result) {
+        if (result == null)
+            return;
         //If the login succeed
         if (result.isSuccess()) {
             //Getting google account
@@ -302,7 +303,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                                 userObj.getString("email"));
 
                         // storing user in shared preferences
-                        MyApplication.getInstance().getPrefManager().storeUser(user);
+                        BaseApplication.getInstance().getPrefManager().storeUser(user);
 
                         // start main activity
                         startActivity(new Intent(getApplicationContext(), MainActivity.class));
@@ -340,7 +341,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         };
 
         //Adding request to request queue
-        MyApplication.getInstance().addToRequestQueue(strReq);
+        BaseApplication.getInstance().addToRequestQueue(strReq);
     }
 
     private void requestFocus(View view) {
@@ -424,14 +425,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 String email = data.getStringExtra(Constants.EXTRA_KEY_USER_EMAIL);
                 inputEmail.setText(email);
             }
-        }
-        else {
+        } else {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             //Calling a new function to handle signin
             handleSignInResult(result);
         }
     }
-
 
 
     private void displayMessage(Profile profile) {
