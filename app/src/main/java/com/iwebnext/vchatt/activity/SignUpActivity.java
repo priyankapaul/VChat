@@ -64,9 +64,10 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        Bundle bundle = getIntent().getExtras();
-        String fbEmail = bundle.getString("email");
-        etEmail.setText(fbEmail);
+//        Bundle bundle = getIntent().getExtras();
+//        String fbEmail = bundle.getString("email");
+//        System.out.println("get email from previous activity" + fbEmail);
+//        etEmail.setText(fbEmail);
 
         spProfession = (Spinner) findViewById(R.id.spinner);
         etName = (EditText) findViewById(R.id.input_name);

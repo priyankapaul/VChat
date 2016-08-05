@@ -502,15 +502,23 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     Profile profile = Profile.getCurrentProfile();
 
                     try {
-                        Intent i = new Intent(LoginActivity.this, SignUpActivity.class);
-                        String Email = object.getString("email");
-                        Bundle bundle = new Bundle();
-                        bundle.putString("email", Email);
-                        i.putExtras(bundle);
-
 
                         inputEmail.setText(object.getString("email"));
-                        inputPassword.setText(object.getString("password"));
+                        //go to next activity
+                        String email = object.getString("email");
+                        Bundle bundle = new Bundle();
+                        bundle.putString("email", email);
+                        System.out.println("email pass to next activity" + email);
+                        Intent i = new Intent(LoginActivity.this, SignUpActivity.class);
+                        i.putExtras(bundle);
+//
+
+//                        String email = object.getString("email");
+//                        Bundle bundle = new Bundle();
+//                       bundle.putString("email", email);
+//                            Intent i =  new Intent (LoginActivity.this, SignUpActivity.class);
+//                        i.putExtra(bundle);
+
 
                         // String inputEmail = object.getString("email");
                     } catch (JSONException e) {
@@ -521,7 +529,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 }
             });
             Bundle parameters = new Bundle();
-            parameters.putString("fields", "email"); // Parámetros que pedimos a facebook
+            parameters.putString("fields", "email,name,location"); // Parámetros que pedimos a facebook
             request.setParameters(parameters);
             request.executeAsync();
         }

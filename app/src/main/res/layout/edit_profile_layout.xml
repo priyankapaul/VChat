@@ -30,11 +30,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="YOUR PROFILE"
+                android:text="PROFILE"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#009ACD"
                 android:textStyle="bold"
-                android:typeface="monospace" />
+               />
 
             <FrameLayout
                 android:id="@+id/fl_profile_pic"
@@ -78,95 +78,149 @@
                 android:paddingTop="1dp"
                 android:weightSum="1">
 
+                <LinearLayout
+                    android:id="@+id/name_layout"
+                    android:layout_width="260dip"
+                    android:layout_height="70dip"
+                    android:gravity="center"
+                    android:orientation="horizontal" >
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/name"
+                        />
                 <EditText
                     android:id="@+id/et_name"
+                    android:paddingLeft="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/show_image"
                     android:hint="Name" />
-
+                    </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/email_layout"
+                    android:layout_width="260dip"
+                    android:layout_height="70dip"
+                    android:gravity="center"
+                    android:orientation="horizontal" >
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/email"/>
                 <EditText
                     android:id="@+id/et_email"
+                    android:paddingLeft="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/et_name"
                     android:hint="Email" />
+                    </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/password_layout"
+                    android:layout_width="260dip"
+                    android:layout_height="70dip"
+                    android:gravity="center"
+                    android:orientation="horizontal" >
 
-                <EditText
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/pass"/>
+
+                    <EditText
                     android:id="@+id/et_password"
+                        android:paddingLeft="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/et_email"
                     android:hint="Password" />
 
+                </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/phone_layout"
+                    android:layout_width="260dip"
+                    android:layout_height="70dip"
+                    android:gravity="center"
+                    android:orientation="horizontal" >
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/phone"/>
                 <EditText
                     android:id="@+id/et_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/et_password"
+                   android:paddingLeft="10dp"
                     android:hint="Phone" />
 
-
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/address_layout"
+                    android:layout_width="260dip"
+                    android:layout_height="70dip"
+                    android:gravity="center"
+                    android:orientation="horizontal" >
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/address"/>
                 <EditText
                     android:id="@+id/et_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/et_phone"
+                   android:paddingLeft="10dp"
                     android:hint="Address" />
 
+                    </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/medical_license_layout"
+                    android:layout_width="260dip"
+                    android:layout_height="70dip"
+                    android:gravity="center"
+                    android:orientation="horizontal" >
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/medical_license_no"/>
                 <EditText
                     android:id="@+id/et_medicalLicenseNo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/et_address"
+                   android:paddingLeft="10dp"
                     android:hint="Medical License No" />
-
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/profession_layout"
+                    android:layout_width="260dip"
+                    android:layout_height="70dip"
+                    android:gravity="center"
+                    android:orientation="horizontal" >
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/profession"/>
                 <EditText
                     android:id="@+id/et_profession"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/et_medicalLicenseNo"
+                  android:paddingLeft="10dp"
                     android:hint="Profession" />
-
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/website_layout"
+                    android:layout_width="260dip"
+                    android:layout_height="70dip"
+                    android:gravity="center"
+                    android:orientation="horizontal" >
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/website"/>
                 <EditText
                     android:id="@+id/et_website"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/et_profession"
+                   android:paddingLeft="10dp"
                     android:hint="Website" />
+                    </LinearLayout>
             </LinearLayout>
 
             <LinearLayout

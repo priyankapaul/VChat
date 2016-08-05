@@ -35,11 +35,7 @@
             android:lines="1"
             android:paddingLeft="10dp" />
 
-        <com.android.volley.toolbox.NetworkImageView
-            android:id="@+id/image_sent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
+
 
         <Button
             android:id="@+id/btn_send"

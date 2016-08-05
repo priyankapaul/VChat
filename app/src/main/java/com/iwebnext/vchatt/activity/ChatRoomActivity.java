@@ -282,7 +282,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     /**
-     * Fetching all the messages of a single chat room
+     * Fetching all the messages of a single user
      */
     private void fetchChatThread() {
 

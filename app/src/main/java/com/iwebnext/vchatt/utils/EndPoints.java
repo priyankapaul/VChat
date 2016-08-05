@@ -21,6 +21,7 @@ public class EndPoints {
     public static final String NAV_DRAWER = "http://inextwebs.com/gcm_chat/include/nav_drawer.php?id=_ID_";
     public static final String SEARCH_ALL_USER = "http://inextwebs.com/gcm_chat/include/search_all_user.php";
     public static final String UPLOAD_IMAGE_URL = "http://inextwebs.com/gcm_chat/include/attach_picture.php";
+
 }
 
 
