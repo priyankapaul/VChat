@@ -1,6 +1,9 @@
 package com.iwebnext.vchatt.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -25,6 +28,7 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
@@ -50,6 +54,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.User;
+import com.iwebnext.vchatt.request.SignUpSocialMediaUserRequest;
 import com.iwebnext.vchatt.utils.Constants;
 import com.iwebnext.vchatt.utils.EndPoints;
 
@@ -58,12 +63,17 @@ import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private static final int TIME_OUT = 3000;
+
+    private static final int RC_VCHAT_REGISTER = 1234;
+    private static final int RC_GPLUS_SIGN_IN = 100;
+
     private SharedPreferences mPrefs;
     private String TAG = LoginActivity.class.getSimpleName();
     private EditText inputPassword;
@@ -71,44 +81,32 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private Button btnEnter;
     private TextView tvSignUp, tvForgetPassword;
     private DotProgressBar progressBar;
-    private static final int REQUEST_CODE_REGISTER = 1234;
     private CallbackManager callbackManager;
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
-    private GoogleSignInOptions gso;
-    private SignInButton signInButton;
+    private GoogleSignInOptions googleSignInOptions;
+    private SignInButton btnSignInGPlus;
 
     //google api client
     private GoogleApiClient mGoogleApiClient;
+    private ProgressDialog progressDialog;
 
-    //Signin constant to check the activity result
-    private int RC_SIGN_IN = 100;
+    // Used for FB
+    private AccessToken accessToken;
+    String emailSocial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /*
+        FB Initialization
+         */
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
         printHashKey();
 
-        FacebookSdk.sdkInitialize(LoginActivity.this.getApplicationContext());
 
-        callbackManager = CallbackManager.Factory.create();
-        accessTokenTracker = new AccessTokenTracker() {
-            @Override
-            protected void onCurrentAccessTokenChanged(AccessToken oldToken, AccessToken newToken) {
-
-            }
-        };
-        profileTracker = new ProfileTracker() {
-            @Override
-            protected void onCurrentProfileChanged(Profile oldProfile, Profile newProfile) {
-                displayMessage(newProfile);
-            }
-        };
-
-        accessTokenTracker.startTracking();
-        profileTracker.startTracking();
         /**
          * Check for login session. It user is already logged in
          * redirect him to main activity
@@ -120,27 +118,75 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         setContentView(R.layout.activity_login);
 
-
-        try {
-            PackageInfo info = getPackageManager().getPackageInfo(
-                    "com.iwebnext.vchatt",
-                    PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
-                MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
-        LoginButton loginButton = (LoginButton) findViewById(R.id.login_fb_button);
+        /*
+        Configuration - Facebook
+         */
+        callbackManager = CallbackManager.Factory.create();
+        accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldToken, AccessToken newToken) {
+
+            }
+        };
+        profileTracker = new ProfileTracker() {
+            @Override
+            protected void onCurrentProfileChanged(Profile oldProfile, Profile newProfile) {
+                if (oldProfile == null && newProfile != null)
+                    loginWithFBProfile(newProfile);
+            }
+        };
+
+        accessTokenTracker.startTracking();
+        profileTracker.startTracking();
+
+        LoginButton btnFBLogin = (LoginButton) findViewById(R.id.login_fb_button);
+        
+        //Setting onclick listener to signing button
+        if (btnFBLogin != null) {
+            btnFBLogin.setReadPermissions(Arrays.asList(
+                    "public_profile", "email", "user_birthday", "user_friends"));
+
+            btnFBLogin.registerCallback(callbackManager, callback);
+        }
+
+        // FB configuration done
+
+        /*
+        Configuration - Google Sign In
+         */
+        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        btnSignInGPlus = (SignInButton) findViewById(R.id.login_gplus_button);
+        btnSignInGPlus.setSize(SignInButton.SIZE_WIDE);
+        btnSignInGPlus.setScopes(googleSignInOptions.getScopeArray());
+
+        //Initializing google api client
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(LoginActivity.this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
+                .build();
+
+
+        btnSignInGPlus.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (v == btnSignInGPlus) {
+                    //Calling sign in
+                    gPlusSignIn();
+                }
+            }
+
+
+        });
+        // Google SignIn configuration done
+
         inputEmail = (EditText) findViewById(R.id.input_email);
         inputPassword = (EditText) findViewById(R.id.input_password);
         btnEnter = (Button) findViewById(R.id.btn_enter);
@@ -150,30 +196,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         progressBar = (DotProgressBar) findViewById(R.id.login_progress_bar);
         inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
 
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        signInButton = (SignInButton) findViewById(R.id.login_gplus_button);
-        signInButton.setSize(SignInButton.SIZE_WIDE);
-        signInButton.setScopes(gso.getScopeArray());
-
-        //Initializing google api client
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(LoginActivity.this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-
-        //Setting onclick listener to signing button
-
-        loginButton.setReadPermissions("user_friends");
-        loginButton.setReadPermissions("email");
-        loginButton.registerCallback(callbackManager, callback);
-
-
         // configure controls
         inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
-
 
         tvForgetPassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -190,7 +214,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             public void onClick(View view) {
 
                 Intent registerIntent = new Intent(LoginActivity.this, SignUpActivity.class);
-                LoginActivity.this.startActivityForResult(registerIntent, REQUEST_CODE_REGISTER);
+                LoginActivity.this.startActivityForResult(registerIntent, RC_VCHAT_REGISTER);
             }
         });
 
@@ -203,31 +227,20 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             }
         });
-
-
-        signInButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (v == signInButton) {
-                    //Calling signin
-                    signIn();
-                }
-            }
-
-
-        });
     }
 
-    private void signIn() {
+    /*
+    GPlus integration
+     */
+    private void gPlusSignIn() {
         //Creating an intent
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
 
         //Starting intent for result
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        startActivityForResult(signInIntent, RC_GPLUS_SIGN_IN);
     }
 
-    private void handleSignInResult(GoogleSignInResult result) {
+    private void handleGoogleSignInResult(GoogleSignInResult result) {
         if (result == null)
             return;
         //If the login succeed
@@ -258,14 +271,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
 
-//    @Override
-//    public void onConnectionFailed(ConnectionResult connectionResult) {
-//
-//    }
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
 
+    }
 
-    //gplus end
+    //GPlus integration END
 
+    /*
+    FB integration
+     */
     public void printHashKey() {
         // Add code to print out the key hash
         try {
@@ -283,6 +298,146 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         }
     }
+
+    private FacebookCallback<LoginResult> callback = new FacebookCallback<LoginResult>() {
+
+        @Override
+        public void onSuccess(LoginResult loginResult) {
+            accessToken = loginResult.getAccessToken();
+            BaseApplication.getInstance().getPrefManager().storeFBAccessToken(accessToken.getToken());
+        }
+
+        @Override
+        public void onCancel() {
+
+        }
+
+        @Override
+        public void onError(FacebookException e) {
+
+        }
+    };
+
+    private void displayMessage(Profile profile) {
+        if (profile != null) {
+            //extra
+        }
+    }
+
+    private void loginWithFBProfile(final Profile profile) {
+        if (profile != null) {
+
+
+            GraphRequest request = GraphRequest.newMeRequest(
+                    accessToken,
+                    new GraphRequest.GraphJSONObjectCallback() {
+                        @Override
+                        public void onCompleted(JSONObject object, GraphResponse response) {
+                            Log.v("LoginActivity", response.toString());
+                            String email = object.optString("email");
+                            // String birthday = object.getString("birthday"); // 01/31/1980 format
+
+                            Profile profile = Profile.getCurrentProfile();
+                            lookupUser(Constants.USER_TYPE_FACEBOOK, profile.getId());
+                        }
+                    });
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "id, name, email, gender, birthday");
+            request.setParameters(parameters);
+            request.executeAsync();
+        }
+    }
+
+    private void lookupUser(final String type, final String id) {
+        showProgress();
+        String endPoint = EndPoints.LOOKUP_SOCIAL_MEDIA_USER + "?type=" + type + "&social_media_id=" + id;
+        JsonObjectRequest request = new JsonObjectRequest(endPoint, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    if (!response.getBoolean("error")) {
+                        dismissProgress();
+                        // User exists
+                        JSONObject userObj = response.getJSONObject("user");
+                        String userId = userObj.getString("user_id");
+                        String name = userObj.getString("name");
+                        String email = userObj.getString("email");
+                        User user = new User(userId, name, email);
+
+                        BaseApplication.getInstance().getPrefManager().storeUser(user);
+                        BaseApplication.getInstance().getPrefManager().setUserType(Constants.USER_TYPE_NORMAL);
+
+                        // Show home screen
+                        showHomeScreen();
+                    } else {
+                        Profile profile = Profile.getCurrentProfile();
+                        sendNewFBUserRegisterRequest(profile.getName(), emailSocial, profile.getId());
+                    }
+                } catch (JSONException e) {
+                    dismissProgress();
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        BaseApplication.getInstance().addToRequestQueue(request);
+    }
+
+    private void sendNewFBUserRegisterRequest(String name, String email, String id) {
+        SignUpSocialMediaUserRequest registerRequest = new SignUpSocialMediaUserRequest(name, email, Constants.USER_TYPE_FACEBOOK, id, fbRegisterListener);
+        BaseApplication.getInstance().addToRequestQueue(registerRequest);
+    }
+
+    Response.Listener<String> fbRegisterListener = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+            dismissProgress();
+
+            try {
+                JSONObject jsonResponse = new JSONObject(response);
+                boolean error = jsonResponse.getBoolean("error");
+                if (!error) {
+                    String userId = jsonResponse.getString("user_id");
+                    String name = Profile.getCurrentProfile().getName();
+                    User user = new User(userId, name, emailSocial);
+                    BaseApplication.getInstance().getPrefManager().storeUser(user);
+                    BaseApplication.getInstance().getPrefManager().setUserType(Constants.USER_TYPE_FACEBOOK);
+                    showHomeScreen();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                    builder.setTitle("Register Failed")
+                            .setMessage("Please try later")
+                            .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    setResult(RESULT_CANCELED);
+                                    finish();
+                                }
+                            })
+                            .create()
+                            .show();
+                }
+            } catch (JSONException e) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                builder.setTitle("Register Failed")
+                        .setMessage("Please try later")
+                        .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                setResult(RESULT_CANCELED);
+                                finish();
+                            }
+                        })
+                        .create()
+                        .show();
+            }
+        }
+    };
+    // FB integration END
 
     /**
      * logging in user. Will make http post request with password, email
@@ -322,11 +477,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
                         // storing user in shared preferences
                         BaseApplication.getInstance().getPrefManager().storeUser(user);
-
-                        // start main activity
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        finish();
-
+                        BaseApplication.getInstance().getPrefManager().setUserType(Constants.USER_TYPE_NORMAL);
                     } else {
                         // login error - simply toast the message
                         Toast.makeText(getApplicationContext(), "" + obj.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();
@@ -368,7 +519,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
     }
 
-
     // Validating email
     private boolean validateEmail() {
         String email = inputEmail.getText().toString().trim();
@@ -399,11 +549,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     private static boolean isValidEmail(String email) {
         return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
     }
 
     private class MyTextWatcher implements TextWatcher {
@@ -439,21 +584,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         callbackManager.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_CODE_REGISTER) {
+            if (requestCode == RC_VCHAT_REGISTER) {
                 String email = data.getStringExtra(Constants.EXTRA_KEY_USER_EMAIL);
                 inputEmail.setText(email);
             }
         } else {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             //Calling a new function to handle signin
-            handleSignInResult(result);
-        }
-    }
-
-
-    private void displayMessage(Profile profile) {
-        if (profile != null) {
-            //extra
+            handleGoogleSignInResult(result);
         }
     }
 
@@ -471,77 +609,23 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         displayMessage(profile);
     }
 
-
-    private FacebookCallback<LoginResult> callback = new FacebookCallback<LoginResult>() {
-
-        @Override
-        public void onSuccess(LoginResult loginResult) {
-            Intent myIntent = new Intent(LoginActivity.this, SignUpActivity.class);
-
-            startActivity(myIntent);
+    private void showHomeScreen() {
+        // start main activity
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        finish();
+    }
 
 
-            String accessToken = loginResult.getAccessToken().getToken();
-            Log.i("accessToken", accessToken);
+    private void showProgress() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Please wait...");
+        progressDialog.setMessage("Registration in progress!");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
 
-            // AccessToken accessToken = loginResult.getAccessToken();
-            // System.out.println("access token"+accessToken);
-
-
-            Profile profile = Profile.getCurrentProfile();
-
-            displayMessage(profile);
-            GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-
-
-                @Override
-                public void onCompleted(JSONObject object, GraphResponse response) {
-                    Log.i("LoginActivity", response.toString());
-                    // Get facebook data from login
-                    //  Bundle bFacebookData = getFacebookData(object);
-                    Profile profile = Profile.getCurrentProfile();
-
-                    try {
-
-                        inputEmail.setText(object.getString("email"));
-                        //go to next activity
-                        String email = object.getString("email");
-                        Bundle bundle = new Bundle();
-                        bundle.putString("email", email);
-                        System.out.println("email pass to next activity" + email);
-                        Intent i = new Intent(LoginActivity.this, SignUpActivity.class);
-                        i.putExtras(bundle);
-//
-
-//                        String email = object.getString("email");
-//                        Bundle bundle = new Bundle();
-//                       bundle.putString("email", email);
-//                            Intent i =  new Intent (LoginActivity.this, SignUpActivity.class);
-//                        i.putExtra(bundle);
-
-
-                        // String inputEmail = object.getString("email");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    //saveNewUser();
-
-                }
-            });
-            Bundle parameters = new Bundle();
-            parameters.putString("fields", "email,name,location"); // Parámetros que pedimos a facebook
-            request.setParameters(parameters);
-            request.executeAsync();
-        }
-
-        @Override
-        public void onCancel() {
-
-        }
-
-        @Override
-        public void onError(FacebookException e) {
-
-        }
-    };
+    private void dismissProgress() {
+        if (progressDialog != null && progressDialog.isShowing())
+            progressDialog.cancel();
+    }
 }

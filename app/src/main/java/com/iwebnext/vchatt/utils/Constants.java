@@ -12,4 +12,8 @@ public class Constants {
     public static final String TAG_IMAGE_URL = "image";
     public static final String tag_image_name = "name";
     public static final String TAG_JSON_LIST = "list";
+
+    public static final String USER_TYPE_NORMAL = "0";
+    public static final String USER_TYPE_FACEBOOK = "1";
+    public static final String USER_TYPE_GPLUS = "2";
 }

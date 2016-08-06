@@ -9,9 +9,11 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+import com.facebook.login.LoginManager;
 import com.iwebnext.vchatt.LruBitmapCache;
 import com.iwebnext.vchatt.activity.LoginActivity;
-import com.iwebnext.vchatt.helper.MyPreferenceManager;
+import com.iwebnext.vchatt.helper.AppPreferenceManager;
+import com.iwebnext.vchatt.utils.Constants;
 
 
 public class BaseApplication extends Application {
@@ -23,7 +25,7 @@ public class BaseApplication extends Application {
 
     private static BaseApplication mInstance;
 
-    private MyPreferenceManager pref;
+    private AppPreferenceManager pref;
 
     private ImageLoader mImageLoader;
 
@@ -45,9 +47,9 @@ public class BaseApplication extends Application {
         return mRequestQueue;
     }
 
-    public MyPreferenceManager getPrefManager() {
+    public AppPreferenceManager getPrefManager() {
         if (pref == null) {
-            pref = new MyPreferenceManager(this);
+            pref = new AppPreferenceManager(this);
         }
 
         return pref;
@@ -77,6 +79,10 @@ public class BaseApplication extends Application {
     }
 
     public void logout() {
+        if(pref.getUserType().equals(Constants.USER_TYPE_FACEBOOK)) {
+            LoginManager.getInstance().logOut();
+        }
+
         pref.clear();
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

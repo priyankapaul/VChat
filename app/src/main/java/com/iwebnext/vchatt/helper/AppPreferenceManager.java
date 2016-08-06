@@ -7,9 +7,9 @@ import android.util.Log;
 import com.iwebnext.vchatt.model.User;
 
 
-public class MyPreferenceManager {
+public class AppPreferenceManager {
 
-    private String TAG = MyPreferenceManager.class.getSimpleName();
+    private String TAG = AppPreferenceManager.class.getSimpleName();
 
     // Shared Preferences
     SharedPreferences pref;
@@ -32,13 +32,33 @@ public class MyPreferenceManager {
     private static final String KEY_USER_EMAIL = "user_email";
     private static final String KEY_NOTIFICATIONS = "notifications";
 
+    private static final String KEY_FB_ACCESS_TOKEN = "fb_access_token";
+    private static final String KEY_USER_TYPE = "user_type";
+
     // Constructor
-    public MyPreferenceManager(Context context) {
+    public AppPreferenceManager(Context context) {
         this._context = context;
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
         editor = pref.edit();
     }
 
+    public void setUserType(String type) {
+        editor.putString(KEY_USER_TYPE, type);
+        editor.commit();
+    }
+
+    public String getUserType() {
+        return pref.getString(KEY_USER_TYPE, null);
+    }
+
+    public void storeFBAccessToken(String accessToken) {
+        editor.putString(KEY_FB_ACCESS_TOKEN, accessToken);
+        editor.commit();
+    }
+
+    public String getFBAccessToken() {
+        return pref.getString(KEY_FB_ACCESS_TOKEN, null);
+    }
 
     public void storeUser(User user) {
         editor.putString(KEY_USER_ID, user.getId());

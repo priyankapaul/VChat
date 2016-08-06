@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -25,13 +24,8 @@ import android.widget.Spinner;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.Profile;
-import com.facebook.login.LoginResult;
 import com.iwebnext.vchatt.R;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.request.SignUpRequest;
 import com.iwebnext.vchatt.utils.Constants;
 import com.iwebnext.vchatt.utils.EndPoints;
@@ -64,11 +58,6 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-//        Bundle bundle = getIntent().getExtras();
-//        String fbEmail = bundle.getString("email");
-//        System.out.println("get email from previous activity" + fbEmail);
-//        etEmail.setText(fbEmail);
-
         spProfession = (Spinner) findViewById(R.id.spinner);
         etName = (EditText) findViewById(R.id.input_name);
         etEmail = (EditText) findViewById(R.id.input_email);
@@ -81,18 +70,22 @@ public class SignUpActivity extends AppCompatActivity {
         Bitmap circularBitmap = ImageConverter.getRoundedCornerBitmap(bitmap, 100);
 
         profileImage = (ImageView) findViewById(R.id.input_image);
-        profileImage.setImageBitmap(circularBitmap);
+        if (profileImage != null) {
+            profileImage.setImageBitmap(circularBitmap);
+        }
 
         final ImageButton selectPicture = (ImageButton) findViewById(R.id.btn_select_picture);
 
-        selectPicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (v == selectPicture) {
-                    showFileChooser();
+        if (selectPicture != null) {
+            selectPicture.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (v == selectPicture) {
+                        showFileChooser();
+                    }
                 }
-            }
-        });
+            });
+        }
 
         spProfession.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -118,27 +111,43 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
-        bRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String name = etName.getText().toString();
-                final String email = etEmail.getText().toString();
-                final String password = etPassword.getText().toString();
-                //  final String degree = etDegree.getText().toString();
-                final String medicalLicenseNo = etMedicalLicenseNo.getText().toString();
-                final String state = etState.getText().toString();
-                final String profession = spProfession.getSelectedItem().toString();
+        if (bRegister != null) {
+            bRegister.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final String name = etName.getText().toString();
+                    final String email = etEmail.getText().toString();
+                    final String password = etPassword.getText().toString();
+                    //  final String degree = etDegree.getText().toString();
+                    final String medicalLicenseNo = etMedicalLicenseNo.getText().toString();
+                    final String state = etState.getText().toString();
+                    final String profession = spProfession.getSelectedItem().toString();
 
-                Response.Listener<String> responseListener = new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsonResponse = new JSONObject(response);
-                            boolean error = jsonResponse.getBoolean("error");
-                            if (!error) {
-                                String userId = jsonResponse.getString("user_id");
-                                invokeImageUploadTask(userId);
-                            } else {
+                    Response.Listener<String> responseListener = new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject jsonResponse = new JSONObject(response);
+                                boolean error = jsonResponse.getBoolean("error");
+                                if (!error) {
+                                    String userId = jsonResponse.getString("user_id");
+                                    invokeImageUploadTask(userId);
+                                } else {
+                                    dismissProgress();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
+                                    builder.setTitle("Register Failed")
+                                            .setMessage("Please try later")
+                                            .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    setResult(RESULT_CANCELED);
+                                                    finish();
+                                                }
+                                            })
+                                            .create()
+                                            .show();
+                                }
+                            } catch (JSONException e) {
                                 dismissProgress();
                                 AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
                                 builder.setTitle("Register Failed")
@@ -153,30 +162,15 @@ public class SignUpActivity extends AppCompatActivity {
                                         .create()
                                         .show();
                             }
-                        } catch (JSONException e) {
-                            dismissProgress();
-                            AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
-                            builder.setTitle("Register Failed")
-                                    .setMessage("Please try later")
-                                    .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            setResult(RESULT_CANCELED);
-                                            finish();
-                                        }
-                                    })
-                                    .create()
-                                    .show();
                         }
-                    }
-                };
+                    };
 
-                SignUpRequest registerRequest = new SignUpRequest(name, email, password, medicalLicenseNo, profession, state, responseListener, "", "", "", "0", "0");
-                RequestQueue queue = Volley.newRequestQueue(SignUpActivity.this);
-                queue.add(registerRequest);
-                showProgress();
-            }
-        });
+                    SignUpRequest request = new SignUpRequest(name, email, password, medicalLicenseNo, profession, state, "", "", "", Constants.USER_TYPE_NORMAL, "0", responseListener);
+                    BaseApplication.getInstance().addToRequestQueue(request);
+                    showProgress();
+                }
+            });
+        }
     }
 
     private void showProgress() {
@@ -268,60 +262,4 @@ public class SignUpActivity extends AppCompatActivity {
                     .show();
         }
     }
-
-    private FacebookCallback<LoginResult> callback = new FacebookCallback<LoginResult>() {
-
-        @Override
-        public void onSuccess(LoginResult loginResult) {
-            String accessToken = loginResult.getAccessToken().getToken();
-            Log.i("accessToken", accessToken);
-
-            // AccessToken accessToken = loginResult.getAccessToken();
-            // System.out.println("access token"+accessToken);
-
-
-            Profile profile = Profile.getCurrentProfile();
-
-            GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-
-
-                @Override
-                public void onCompleted(JSONObject object, GraphResponse response) {
-                    Log.i("LoginActivity", response.toString());
-                    // Get facebook data from login
-                    //  Bundle bFacebookData = getFacebookData(object);
-                    Profile profile = Profile.getCurrentProfile();
-
-                    try {
-
-                        etEmail.setText(object.getString("email"));
-                        etName.setText(object.getString("name"));
-                        etState.setText(object.getString("location"));
-
-
-                        // String inputEmail = object.getString("email");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    //saveNewUser();
-
-                }
-            });
-            Bundle parameters = new Bundle();
-            parameters.putString("fields", "email,name,location"); // Parámetros que pedimos a facebook
-            request.setParameters(parameters);
-            request.executeAsync();
-        }
-
-
-        @Override
-        public void onCancel() {
-
-        }
-
-        @Override
-        public void onError(FacebookException e) {
-
-        }
-    };
 }
