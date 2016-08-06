@@ -95,8 +95,7 @@ public class FriendRequestActivity extends AppCompatActivity {
                         };
 
                         FriendRequestAccept friendRequest = new FriendRequestAccept(id, responseListener);
-                        RequestQueue queue = Volley.newRequestQueue(FriendRequestActivity.this);
-                        queue.add(friendRequest);
+                        BaseApplication.getInstance().addToRequestQueue(friendRequest);
                     }
                 });
 
@@ -131,10 +130,7 @@ public class FriendRequestActivity extends AppCompatActivity {
                         };
 
                         FriendRequestDecline friendRequest = new FriendRequestDecline(id, responseListener);
-                        RequestQueue queue = Volley.newRequestQueue(FriendRequestActivity.this);
-                        queue.add(friendRequest);
-
-
+                        BaseApplication.getInstance().addToRequestQueue(friendRequest);
                     }
                 });
                 builder.show();

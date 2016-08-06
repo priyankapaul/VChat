@@ -22,6 +22,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.activity.ImageConverter;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.User;
 import com.iwebnext.vchatt.request.FriendRequestCancelled;
 import com.iwebnext.vchatt.request.FriendRequestSent;
@@ -125,8 +126,7 @@ public class FriendRequestSentFragment extends Fragment {
                 };
 
                 FriendRequestSent addRequest = new FriendRequestSent(id, responseListener);
-                RequestQueue queue = Volley.newRequestQueue(getActivity());
-                queue.add(addRequest);
+                BaseApplication.getInstance().addToRequestQueue(addRequest);
 
             }
         });
@@ -170,8 +170,7 @@ public class FriendRequestSentFragment extends Fragment {
                 };
 
                 FriendRequestCancelled cancelRequest = new FriendRequestCancelled(id, responseListener);
-                RequestQueue queue = Volley.newRequestQueue(getActivity());
-                queue.add(cancelRequest);
+                BaseApplication.getInstance().addToRequestQueue(cancelRequest);
 
             }
         });

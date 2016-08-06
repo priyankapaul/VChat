@@ -186,8 +186,7 @@ public class ProfileFragment extends Fragment {
                     };
 
                     ProfileRequest registerRequest = new ProfileRequest(selfUserId, name, email, password, address, telephone, medicalLicenseNo, profession, website, responseListener);
-                    RequestQueue queue = Volley.newRequestQueue(getActivity());
-                    queue.add(registerRequest);
+                    BaseApplication.getInstance().addToRequestQueue(registerRequest);
 
                 }
             }

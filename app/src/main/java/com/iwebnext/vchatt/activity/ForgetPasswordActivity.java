@@ -14,6 +14,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.Volley;
 import com.github.silvestrpredko.dotprogressbar.DotProgressBar;
 import com.iwebnext.vchatt.R;
+import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.request.ForgetPasswordRequest;
 
 import org.json.JSONException;
@@ -90,8 +91,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                 };
 
                 ForgetPasswordRequest forgetPasswordRequest = new ForgetPasswordRequest(forgetEmail, responseListener);
-                RequestQueue queue = Volley.newRequestQueue(ForgetPasswordActivity.this);
-                queue.add(forgetPasswordRequest);
+                BaseApplication.getInstance().addToRequestQueue(forgetPasswordRequest);
             }
         });
 

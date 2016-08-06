@@ -145,11 +145,7 @@ public class AttachPictureActivity extends AppCompatActivity {
             }
 
         };
-        //Creating a Request Queue
-        RequestQueue requestQueue = Volley.newRequestQueue(AttachPictureActivity.this);
-
-        //Adding request to the queue
-        requestQueue.add(stringRequest);
+        BaseApplication.getInstance().addToRequestQueue(stringRequest);
     }
 
     @Override
