@@ -51,6 +51,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.plus.model.people.Person;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.User;
@@ -144,7 +145,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         profileTracker.startTracking();
 
         LoginButton btnFBLogin = (LoginButton) findViewById(R.id.login_fb_button);
-        
+
         //Setting onclick listener to signing button
         if (btnFBLogin != null) {
             btnFBLogin.setReadPermissions(Arrays.asList(
@@ -252,6 +253,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             inputEmail.setText(acct.getEmail());
 
+
 //            //Initializing image loader
 //            imageLoader = CustomVolleyRequest.getInstance(this.getApplicationContext())
 //                    .getImageLoader();
@@ -335,6 +337,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         public void onCompleted(JSONObject object, GraphResponse response) {
                             Log.v("LoginActivity", response.toString());
                             String email = object.optString("email");
+                            emailSocial = email;
                             // String birthday = object.getString("birthday"); // 01/31/1980 format
 
                             Profile profile = Profile.getCurrentProfile();
@@ -348,10 +351,15 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
     }
 
+    /**
+     * This method is for look up any user
+     * @param type = 0 for Normal User, type = 1 for Facebook, type = 2 for GPlus
+     * @param id
+     */
     private void lookupUser(final String type, final String id) {
         showProgress();
         String endPoint = EndPoints.LOOKUP_SOCIAL_MEDIA_USER + "?type=" + type + "&social_media_id=" + id;
-        JsonObjectRequest request = new JsonObjectRequest(endPoint, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, endPoint, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
@@ -362,10 +370,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         String userId = userObj.getString("user_id");
                         String name = userObj.getString("name");
                         String email = userObj.getString("email");
+                        String type = userObj.getString("type");
                         User user = new User(userId, name, email);
 
                         BaseApplication.getInstance().getPrefManager().storeUser(user);
-                        BaseApplication.getInstance().getPrefManager().setUserType(Constants.USER_TYPE_NORMAL);
+                        BaseApplication.getInstance().getPrefManager().setUserType(type);
 
                         // Show home screen
                         showHomeScreen();
@@ -381,13 +390,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                Log.i(TAG, error.getMessage());
             }
         });
         BaseApplication.getInstance().addToRequestQueue(request);
     }
 
     private void sendNewFBUserRegisterRequest(String name, String email, String id) {
+        if (email == null) {
+            email = " ";
+        }
         SignUpSocialMediaUserRequest registerRequest = new SignUpSocialMediaUserRequest(name, email, Constants.USER_TYPE_FACEBOOK, id, fbRegisterListener);
         BaseApplication.getInstance().addToRequestQueue(registerRequest);
     }
