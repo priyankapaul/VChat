@@ -13,6 +13,7 @@ import com.facebook.login.LoginManager;
 import com.iwebnext.vchatt.LruBitmapCache;
 import com.iwebnext.vchatt.activity.LoginActivity;
 import com.iwebnext.vchatt.helper.AppPreferenceManager;
+import com.iwebnext.vchatt.request.DeleteChatHistoryRequest;
 import com.iwebnext.vchatt.utils.Constants;
 
 
@@ -64,6 +65,7 @@ public class BaseApplication extends Application {
         req.setTag(TAG);
         getRequestQueue().add(req);
     }
+
     public ImageLoader getImageLoader() {
         getRequestQueue();
         if (mImageLoader == null) {
@@ -79,7 +81,9 @@ public class BaseApplication extends Application {
     }
 
     public void logout() {
-        if(pref.getUserType().equals(Constants.USER_TYPE_FACEBOOK)) {
+        deleteChatHistoryAtLogout();
+        
+        if (pref.getUserType().equals(Constants.USER_TYPE_FACEBOOK)) {
             LoginManager.getInstance().logOut();
         }
 
@@ -89,4 +93,8 @@ public class BaseApplication extends Application {
         startActivity(intent);
     }
 
+    private void deleteChatHistoryAtLogout() {
+        String userId = pref.getUser().getId();
+        addToRequestQueue(new DeleteChatHistoryRequest(userId, null));
+    }
 }
