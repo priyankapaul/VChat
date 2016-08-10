@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -51,7 +52,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.plus.model.people.Person;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.User;
@@ -187,6 +187,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         });
         // Google SignIn configuration done
+
+        // welcome view
+        TextView tx = (TextView) findViewById(R.id.tv_welcome);
+        Typeface customFont = Typeface.createFromAsset(getAssets(), "fonts/painting_the_light.ttf");
+        tx.setTypeface(customFont);
 
         inputEmail = (EditText) findViewById(R.id.input_email);
         inputPassword = (EditText) findViewById(R.id.input_password);
@@ -353,6 +358,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     /**
      * This method is for look up any user
+     *
      * @param type = 0 for Normal User, type = 1 for Facebook, type = 2 for GPlus
      * @param id
      */

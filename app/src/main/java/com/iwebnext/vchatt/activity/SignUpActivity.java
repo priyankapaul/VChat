@@ -229,6 +229,24 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void invokeImageUploadTask(String userId) {
+        // No image to upload as avatar
+        if (uploadFile == null) {
+            dismissProgress();
+            AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
+            builder.setMessage("Registered Successfully")
+                    .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent();
+                            intent.putExtra(Constants.EXTRA_KEY_USER_EMAIL, etEmail.getText().toString());
+                            setResult(RESULT_OK, intent);
+                            finish();
+                        }
+                    })
+                    .create()
+                    .show();
+            return;
+        }
         String[] params = new String[]{uploadFile, userId, EndPoints.UPDATE_AVATAR};
         new UploadImageAsyncTask().execute(params);
     }

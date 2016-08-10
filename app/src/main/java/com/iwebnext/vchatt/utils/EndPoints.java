@@ -19,6 +19,8 @@ public class EndPoints {
     public static final String PROFILE =  BASE_URL + "/user_profile/_ID_";
     public static final String UPDATE_AVATAR =  BASE_URL + "/update_avatar";
     public static final String UPLOAD_VIDEO =  BASE_URL + "/upload_video";
+    public static final String DELETE_CHAT_HISTORY =  BASE_URL + "/delete_chat_history";
+
 
     // TODO - To use standard /v1/ version of APIs
     public static final String NAV_DRAWER = "http://inextwebs.com/gcm_chat/include/nav_drawer.php?id=_ID_";
