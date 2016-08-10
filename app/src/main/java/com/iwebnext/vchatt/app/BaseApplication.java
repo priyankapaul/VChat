@@ -4,9 +4,12 @@ package com.iwebnext.vchatt.app;
 import android.app.Application;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.facebook.login.LoginManager;
@@ -82,7 +85,7 @@ public class BaseApplication extends Application {
 
     public void logout() {
         deleteChatHistoryAtLogout();
-        
+
         if (pref.getUserType().equals(Constants.USER_TYPE_FACEBOOK)) {
             LoginManager.getInstance().logOut();
         }
@@ -95,6 +98,17 @@ public class BaseApplication extends Application {
 
     private void deleteChatHistoryAtLogout() {
         String userId = pref.getUser().getId();
-        addToRequestQueue(new DeleteChatHistoryRequest(userId, null));
+        addToRequestQueue(new DeleteChatHistoryRequest(userId, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(TAG, "logout response: " + response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "logout VolleyError: " + error.getMessage());
+
+            }
+        }));
     }
 }

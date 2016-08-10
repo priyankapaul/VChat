@@ -496,6 +496,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         // storing user in shared preferences
                         BaseApplication.getInstance().getPrefManager().storeUser(user);
                         BaseApplication.getInstance().getPrefManager().setUserType(Constants.USER_TYPE_NORMAL);
+
+                        // Show home screen
+                        showHomeScreen();
                     } else {
                         // login error - simply toast the message
                         Toast.makeText(getApplicationContext(), "" + obj.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();

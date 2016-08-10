@@ -13,8 +13,8 @@ import java.util.Map;
 public class DeleteChatHistoryRequest extends StringRequest {
     private Map<String, String> params;
 
-    public DeleteChatHistoryRequest(String userId, Response.Listener<String> listener) {
-        super(Method.POST, EndPoints.DELETE_CHAT_HISTORY, listener, null);
+    public DeleteChatHistoryRequest(String userId, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        super(Method.POST, EndPoints.DELETE_CHAT_HISTORY, listener, errorListener);
 
         params = new HashMap<>();
         params.put("user_id", userId);

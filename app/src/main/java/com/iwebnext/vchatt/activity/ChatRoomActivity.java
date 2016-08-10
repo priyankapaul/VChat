@@ -128,6 +128,9 @@ public class ChatRoomActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
         switch (item.getItemId()) {
+            case R.id.action_logout:
+                BaseApplication.getInstance().logout();
+                break;
             case R.id.action_attach_image:
                 intent = new Intent(ChatRoomActivity.this, AttachPictureActivity.class);
                 intent.putExtra(Constants.EXTRA_KEY_FRIEND_ID, friendId);
