@@ -75,6 +75,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private static final int RC_VCHAT_REGISTER = 1234;
     private static final int RC_GPLUS_SIGN_IN = 100;
 
+    private ProgressDialog progressDialog;
+
     private SharedPreferences mPrefs;
     private String TAG = LoginActivity.class.getSimpleName();
     private EditText inputPassword;
@@ -82,17 +84,17 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private Button btnEnter;
     private TextView tvSignUp, tvForgetPassword;
     private DotProgressBar progressBar;
+
+    //google api client
+    private SignInButton btnSignInGPlus;
+    private GoogleSignInOptions googleSignInOptions;
+    private GoogleApiClient mGoogleApiClient;
+    GoogleSignInAccount googleSignInAccount;
+
+    // Used for FB
     private CallbackManager callbackManager;
     private AccessTokenTracker accessTokenTracker;
     private ProfileTracker profileTracker;
-    private GoogleSignInOptions googleSignInOptions;
-    private SignInButton btnSignInGPlus;
-
-    //google api client
-    private GoogleApiClient mGoogleApiClient;
-    private ProgressDialog progressDialog;
-
-    // Used for FB
     private AccessToken accessToken;
     String emailSocial;
 
@@ -163,10 +165,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .requestEmail()
                 .build();
 
-        btnSignInGPlus = (SignInButton) findViewById(R.id.login_gplus_button);
-        btnSignInGPlus.setSize(SignInButton.SIZE_WIDE);
-        btnSignInGPlus.setScopes(googleSignInOptions.getScopeArray());
-
         //Initializing google api client
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(LoginActivity.this /* FragmentActivity */, this /* OnConnectionFailedListener */)
@@ -174,14 +172,15 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .build();
 
 
+        btnSignInGPlus = (SignInButton) findViewById(R.id.login_gplus_button);
+        btnSignInGPlus.setSize(SignInButton.SIZE_WIDE);
+        btnSignInGPlus.setScopes(googleSignInOptions.getScopeArray());
+
         btnSignInGPlus.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                if (v == btnSignInGPlus) {
-                    //Calling sign in
-                    gPlusSignIn();
-                }
+                gPlusSignIn();
             }
 
 
@@ -252,28 +251,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         //If the login succeed
         if (result.isSuccess()) {
             //Getting google account
-            GoogleSignInAccount acct = result.getSignInAccount();
-
-            //Displaying name and email
-
-            inputEmail.setText(acct.getEmail());
-
-
-//            //Initializing image loader
-//            imageLoader = CustomVolleyRequest.getInstance(this.getApplicationContext())
-//                    .getImageLoader();
-//
-//            imageLoader.get(acct.getPhotoUrl().toString(),
-//                    ImageLoader.getImageListener(profilePhoto,
-//                            R.mipmap.ic_launcher,
-//                            R.mipmap.ic_launcher));
-//
-//            //Loading image
-//            profilePhoto.setImageUrl(acct.getPhotoUrl().toString(), imageLoader);
-
+            googleSignInAccount = result.getSignInAccount();
+            lookupUser(Constants.USER_TYPE_GPLUS, googleSignInAccount.getId());
         } else {
             //If login fails
-            Toast.makeText(this, "Login Failed", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -385,8 +367,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         // Show home screen
                         showHomeScreen();
                     } else {
-                        Profile profile = Profile.getCurrentProfile();
-                        sendNewFBUserRegisterRequest(profile.getName(), emailSocial, profile.getId());
+                        if (type.equals(Constants.USER_TYPE_FACEBOOK)) {
+                            Profile profile = Profile.getCurrentProfile();
+                            sendNewSocialMediaRegisterRequest(type, profile.getName(), emailSocial, profile.getId());
+                        } else if (type.equals(Constants.USER_TYPE_GPLUS)) {
+                            if (googleSignInAccount != null) {
+                                sendNewSocialMediaRegisterRequest(type, googleSignInAccount.getDisplayName(), googleSignInAccount.getEmail(), googleSignInAccount.getId());
+                            }
+                        }
                     }
                 } catch (JSONException e) {
                     dismissProgress();
@@ -396,17 +384,20 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.i(TAG, error.getMessage());
+                dismissProgress();
+                Log.i(TAG, "lookup request error: " + error);
+                if (error.equals("Volley Timeout Error"))
+                    Toast.makeText(LoginActivity.this, "Server is not reachable", Toast.LENGTH_SHORT).show();
             }
         });
         BaseApplication.getInstance().addToRequestQueue(request);
     }
 
-    private void sendNewFBUserRegisterRequest(String name, String email, String id) {
+    private void sendNewSocialMediaRegisterRequest(String type, String name, String email, String id) {
         if (email == null) {
             email = " ";
         }
-        SignUpSocialMediaUserRequest registerRequest = new SignUpSocialMediaUserRequest(name, email, Constants.USER_TYPE_FACEBOOK, id, fbRegisterListener);
+        SignUpSocialMediaUserRequest registerRequest = new SignUpSocialMediaUserRequest(name, email, type, id, fbRegisterListener);
         BaseApplication.getInstance().addToRequestQueue(registerRequest);
     }
 
@@ -604,15 +595,17 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
 
+        if (requestCode == RC_GPLUS_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            //Calling a new function to handle signin
+            handleGoogleSignInResult(result);
+        }
+
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == RC_VCHAT_REGISTER) {
                 String email = data.getStringExtra(Constants.EXTRA_KEY_USER_EMAIL);
                 inputEmail.setText(email);
             }
-        } else {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            //Calling a new function to handle signin
-            handleGoogleSignInResult(result);
         }
     }
 
