@@ -6,7 +6,7 @@ android {
         config {
             keyAlias 'vchat'
             keyPassword 'priyanka123'
-            storeFile file('/Users/mithun.roy/Projects/YoYo/vchat-release-key.keystore')
+            storeFile file('/Users/mithun.roy/Projects/YoYo/VChat/app/misc/vchat-release-key.keystore')
             storePassword 'priyanka123'
         }
     }

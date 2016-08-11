@@ -85,6 +85,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private TextView tvSignUp, tvForgetPassword;
     private DotProgressBar progressBar;
 
+    //    type = 0 for Normal User, type = 1 for Facebook, type = 2 for GPlus
+    private String userType;
+
     //google api client
     private SignInButton btnSignInGPlus;
     private GoogleSignInOptions googleSignInOptions;
@@ -252,7 +255,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         if (result.isSuccess()) {
             //Getting google account
             googleSignInAccount = result.getSignInAccount();
-            lookupUser(Constants.USER_TYPE_GPLUS, googleSignInAccount.getId());
+            userType = Constants.USER_TYPE_GPLUS;
+            emailSocial = googleSignInAccount.getEmail();
+            lookupUser(googleSignInAccount.getId());
         } else {
             //If login fails
             Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show();
@@ -328,7 +333,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             // String birthday = object.getString("birthday"); // 01/31/1980 format
 
                             Profile profile = Profile.getCurrentProfile();
-                            lookupUser(Constants.USER_TYPE_FACEBOOK, profile.getId());
+                            userType = Constants.USER_TYPE_FACEBOOK;
+                            lookupUser(profile.getId());
                         }
                     });
             Bundle parameters = new Bundle();
@@ -341,12 +347,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     /**
      * This method is for look up any user
      *
-     * @param type = 0 for Normal User, type = 1 for Facebook, type = 2 for GPlus
      * @param id
      */
-    private void lookupUser(final String type, final String id) {
+    private void lookupUser(final String id) {
         showProgress();
-        String endPoint = EndPoints.LOOKUP_SOCIAL_MEDIA_USER + "?type=" + type + "&social_media_id=" + id;
+        String endPoint = EndPoints.LOOKUP_SOCIAL_MEDIA_USER + "?type=" + userType + "&social_media_id=" + id;
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, endPoint, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -367,12 +372,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         // Show home screen
                         showHomeScreen();
                     } else {
-                        if (type.equals(Constants.USER_TYPE_FACEBOOK)) {
+                        if (userType.equals(Constants.USER_TYPE_FACEBOOK)) {
                             Profile profile = Profile.getCurrentProfile();
-                            sendNewSocialMediaRegisterRequest(type, profile.getName(), emailSocial, profile.getId());
-                        } else if (type.equals(Constants.USER_TYPE_GPLUS)) {
+                            sendNewSocialMediaRegisterRequest(profile.getName(), profile.getId());
+                        } else if (userType.equals(Constants.USER_TYPE_GPLUS)) {
                             if (googleSignInAccount != null) {
-                                sendNewSocialMediaRegisterRequest(type, googleSignInAccount.getDisplayName(), googleSignInAccount.getEmail(), googleSignInAccount.getId());
+                                sendNewSocialMediaRegisterRequest(googleSignInAccount.getDisplayName(), googleSignInAccount.getId());
                             }
                         }
                     }
@@ -393,15 +398,15 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         BaseApplication.getInstance().addToRequestQueue(request);
     }
 
-    private void sendNewSocialMediaRegisterRequest(String type, String name, String email, String id) {
-        if (email == null) {
-            email = " ";
+    private void sendNewSocialMediaRegisterRequest(String name, String id) {
+        if (emailSocial == null) {
+            emailSocial = " ";
         }
-        SignUpSocialMediaUserRequest registerRequest = new SignUpSocialMediaUserRequest(name, email, type, id, fbRegisterListener);
+        SignUpSocialMediaUserRequest registerRequest = new SignUpSocialMediaUserRequest(name, emailSocial, userType, id, registerListener);
         BaseApplication.getInstance().addToRequestQueue(registerRequest);
     }
 
-    Response.Listener<String> fbRegisterListener = new Response.Listener<String>() {
+    Response.Listener<String> registerListener = new Response.Listener<String>() {
         @Override
         public void onResponse(String response) {
             dismissProgress();
@@ -411,7 +416,15 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 boolean error = jsonResponse.getBoolean("error");
                 if (!error) {
                     String userId = jsonResponse.getString("user_id");
-                    String name = Profile.getCurrentProfile().getName();
+
+                    String name = "";
+                    if (userType.equals(Constants.USER_TYPE_FACEBOOK)) {
+                        Profile profile = Profile.getCurrentProfile();
+                        name = profile.getName();
+                    } else if (userType.equals(Constants.USER_TYPE_GPLUS)) {
+                        name = googleSignInAccount.getDisplayName();
+                    }
+
                     User user = new User(userId, name, emailSocial);
                     BaseApplication.getInstance().getPrefManager().storeUser(user);
                     BaseApplication.getInstance().getPrefManager().setUserType(Constants.USER_TYPE_FACEBOOK);
