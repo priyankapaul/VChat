@@ -156,7 +156,7 @@ public class AttachVideoActivity extends AppCompatActivity implements View.OnCli
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = ProgressDialog.show(AttachVideoActivity.this, "Uploading File", "Please wait...", false, false);
+            progressDialog = ProgressDialog.show(AttachVideoActivity.this, "Sending File", "Please wait...", false, false);
         }
 
         @Override

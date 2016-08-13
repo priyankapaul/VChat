@@ -11,12 +11,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.adapter.FriendRequestAdapter;
 import com.iwebnext.vchatt.app.BaseApplication;
@@ -175,7 +173,7 @@ public class FriendRequestActivity extends AppCompatActivity {
                     }
                 } catch (JSONException e) {
                     Log.e(TAG, "json parsing error: " + e.getMessage());
-                    Toast.makeText(FriendRequestActivity.this, "Json parse error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(FriendRequestActivity.this, "Json parse error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
 
                 adapter.notifyDataSetChanged();

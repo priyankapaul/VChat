@@ -302,7 +302,10 @@ public class ChatRoomActivity extends AppCompatActivity {
             public void onResponse(String response) {
                 Log.e(TAG, "response: " + response);
 
+
                 try {
+
+                     messageArrayList.clear();
                     JSONObject obj = new JSONObject(response);
 
                     // check for error
@@ -327,6 +330,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                             Message message = new Message(commentId, commentText, createdAt, user, type);
                             messageArrayList.add(message);
+
                         }
 
                         mAdapter.notifyDataSetChanged();

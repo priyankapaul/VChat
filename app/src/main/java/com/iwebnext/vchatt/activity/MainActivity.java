@@ -105,8 +105,11 @@ public class MainActivity extends AppCompatActivity {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+//            Intent i = new Intent(MainActivity.this,HomeFragment.class);
+//            startActivity(i);
         }
     }
+
 
     private void launchLoginActivity() {
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);

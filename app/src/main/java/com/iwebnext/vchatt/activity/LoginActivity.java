@@ -1,5 +1,6 @@
 package com.iwebnext.vchatt.activity;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -9,7 +10,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,6 +20,7 @@ import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -85,7 +87,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private TextView tvSignUp, tvForgetPassword;
     private DotProgressBar progressBar;
 
-    //    type = 0 for Normal User, type = 1 for Facebook, type = 2 for GPlus
+    // type = 0 for Normal User, type = 1 for Facebook, type = 2 for GPlus
     private String userType;
 
     //google api client
@@ -101,6 +103,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private AccessToken accessToken;
     String emailSocial;
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,7 +129,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         /*
         Configuration - Facebook
@@ -191,9 +193,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         // Google SignIn configuration done
 
         // welcome view
-        TextView tx = (TextView) findViewById(R.id.tv_welcome);
-        Typeface customFont = Typeface.createFromAsset(getAssets(), "fonts/painting_the_light.ttf");
-        tx.setTypeface(customFont);
+//        TextView tx = (TextView) findViewById(R.id.tv_welcome);
+//        Typeface customFont = Typeface.createFromAsset(getAssets(), "fonts/painting_the_light.ttf");
+//        tx.setTypeface(customFont);
 
         inputEmail = (EditText) findViewById(R.id.input_email);
         inputPassword = (EditText) findViewById(R.id.input_password);
@@ -235,6 +237,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             }
         });
+
+        Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.setStatusBarColor(this.getResources().getColor(R.color.black));
     }
 
     /*
@@ -510,7 +517,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
                 } catch (JSONException e) {
                     Log.e(TAG, "json parsing error: " + e.getMessage());
-                    Toast.makeText(getApplicationContext(), "Json parse error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(getApplicationContext(), "Json parse error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "your trial period for this app has espired",
+                            Toast.LENGTH_LONG).show();
+                    Intent i = new Intent(getApplicationContext(), AppExpireActivity.class);
+                    startActivity(i);
                 }
             }
         }, new Response.ErrorListener() {
@@ -520,6 +531,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 NetworkResponse networkResponse = error.networkResponse;
                 Log.e(TAG, "Network error: " + error.getMessage() + ", code: " + networkResponse);
                 Toast.makeText(getApplicationContext(), "Network error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+
             }
         }) {
 
