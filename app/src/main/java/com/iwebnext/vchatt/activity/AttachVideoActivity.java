@@ -24,11 +24,16 @@ import android.widget.VideoView;
 
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.app.BaseApplication;
+import com.iwebnext.vchatt.model.Message;
 import com.iwebnext.vchatt.utils.Constants;
 import com.iwebnext.vchatt.utils.EndPoints;
 import com.iwebnext.vchatt.utils.FilePathUtils;
 import com.iwebnext.vchatt.utils.FileUploadUtils;
 
+/**
+ * THIS CLASS HAS BEEN DEPRECATED AND TO BE USED ONLY FOR DEBUGGING PURPOSES
+ */
+@Deprecated
 public class AttachVideoActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = AttachVideoActivity.class.getSimpleName();
@@ -162,7 +167,7 @@ public class AttachVideoActivity extends AppCompatActivity implements View.OnCli
         @Override
         protected Void doInBackground(Void... params) {
             String userId = BaseApplication.getInstance().getPrefManager().getUser().getId();
-            FileUploadUtils.uploadVideo(selectedPath, userId, peerId, EndPoints.UPLOAD_VIDEO);
+            FileUploadUtils.uploadFile(selectedPath, EndPoints.UPLOAD_FILE, userId, peerId, String.valueOf(Message.VIDEO));
             return null;
         }
 

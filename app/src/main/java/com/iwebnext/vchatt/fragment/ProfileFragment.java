@@ -459,7 +459,7 @@ public class ProfileFragment extends Fragment {
 
         @Override
         protected Void doInBackground(String... params) {
-            FileUploadUtils.uploadImage(params[0], params[1], params[2]);
+            FileUploadUtils.uploadAvatar(params[0], params[1], params[2]);
             return null;
         }
 

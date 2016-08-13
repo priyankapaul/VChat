@@ -29,7 +29,7 @@ public class FileUploadUtils {
 
     public static final int PERMISSIONS_REQUEST_READ_MEDIA = 3;
 
-    public static String uploadImage(String fileName, String userId, String uploadUrl) {
+    public static String uploadAvatar(String fileName, String userId, String uploadUrl) {
         int serverResponseCode = -1;
 
         HttpURLConnection conn = null;
@@ -136,7 +136,7 @@ public class FileUploadUtils {
      *
      * @return
      */
-    public static String uploadVideo(String fileName, String userId, String peerId, String uploadUrl) {
+    public static String uploadFile(String fileName, String uploadUrl, String userId, String peerId, String type) {
         int serverResponseCode = -1;
 
         HttpURLConnection conn = null;
@@ -212,6 +212,17 @@ public class FileUploadUtils {
 
             dataOutputStream.writeBytes(LINE_END);
             dataOutputStream.writeBytes(peerId);
+            dataOutputStream.writeBytes(LINE_END);
+
+            /**
+             * 4th - String Part
+             */
+            dataOutputStream.writeBytes(TWO_HYPHENS + BOUNDARY + LINE_END);
+            dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"type\"");
+            dataOutputStream.writeBytes(LINE_END);
+
+            dataOutputStream.writeBytes(LINE_END);
+            dataOutputStream.writeBytes(type);
             dataOutputStream.writeBytes(LINE_END);
 
             /**

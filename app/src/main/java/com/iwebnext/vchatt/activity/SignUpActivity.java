@@ -21,9 +21,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.toolbox.Volley;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.request.SignUpRequest;
@@ -258,7 +256,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            return FileUploadUtils.uploadImage(params[0], params[1], params[2]);
+            return FileUploadUtils.uploadAvatar(params[0], params[1], params[2]);
         }
 
         @Override

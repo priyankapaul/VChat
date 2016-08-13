@@ -37,6 +37,10 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
 
+/**
+ * THIS CLASS HAS BEEN DEPRECATED AND TO BE USED ONLY FOR DEBUGGING PURPOSES
+ */
+@Deprecated
 public class AttachPictureActivity extends AppCompatActivity {
     private String TAG = AttachPictureActivity.class.getSimpleName();
     private static final int PICK_IMAGE_REQUEST = 1;

@@ -1,9 +1,13 @@
 package com.iwebnext.vchatt.activity;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -30,13 +34,15 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.adapter.ChatRoomThreadAdapter;
-import com.iwebnext.vchatt.app.Config;
 import com.iwebnext.vchatt.app.BaseApplication;
+import com.iwebnext.vchatt.app.Config;
 import com.iwebnext.vchatt.gcm.NotificationUtils;
 import com.iwebnext.vchatt.model.Message;
 import com.iwebnext.vchatt.model.User;
 import com.iwebnext.vchatt.utils.Constants;
 import com.iwebnext.vchatt.utils.EndPoints;
+import com.iwebnext.vchatt.utils.FilePathUtils;
+import com.iwebnext.vchatt.utils.FileUploadUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +56,10 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private String TAG = ChatRoomActivity.class.getSimpleName();
 
-    private String friendId;
+    private static final int RC_PICK_IMAGE = 1;
+    private static final int RC_SELECT_VIDEO = 2;
+
+    private String peerId;
     private RecyclerView rvChatThread;
     private ChatRoomThreadAdapter mAdapter;
     private ArrayList<Message> messageArrayList;
@@ -58,16 +67,18 @@ public class ChatRoomActivity extends AppCompatActivity {
     private EditText inputMessage;
     private Button btnSend;
 
+    String uploadFile;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
         final Intent intent = getIntent();
-        friendId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
+        peerId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
         String title = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_NAME);
 
-        if (friendId == null) {
+        if (peerId == null) {
             Toast.makeText(getApplicationContext(), "Chat room not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -117,6 +128,22 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            int type = -1;
+            if (requestCode == RC_PICK_IMAGE) {
+                type = Message.IMAGE;
+            } else if (requestCode == RC_SELECT_VIDEO) {
+                type = Message.VIDEO;
+            }
+            Uri filePath = data.getData();
+            uploadFile = FilePathUtils.getPath(ChatRoomActivity.this, filePath);
+
+            invokeImageUploadTask(type);
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.chat_menu, menu);
@@ -132,16 +159,10 @@ public class ChatRoomActivity extends AppCompatActivity {
                 BaseApplication.getInstance().logout();
                 break;
             case R.id.action_attach_image:
-                intent = new Intent(ChatRoomActivity.this, AttachPictureActivity.class);
-                intent.putExtra(Constants.EXTRA_KEY_FRIEND_ID, friendId);
-
-                startActivity(intent);
+                chooseImage();
                 return true;
             case R.id.action_attach_video:
-                intent = new Intent(ChatRoomActivity.this, AttachVideoActivity.class);
-                intent.putExtra(Constants.EXTRA_KEY_FRIEND_ID, friendId);
-
-                startActivity(intent);
+                chooseVideo();
                 return true;
         }
 
@@ -171,9 +192,13 @@ public class ChatRoomActivity extends AppCompatActivity {
      */
     private void handlePushNotification(Intent intent) {
         Message message = (Message) intent.getSerializableExtra("message");
-        String friendId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
+        String peerId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
 
-        if (message != null && friendId != null) {
+        updateMessageList(message, peerId);
+    }
+
+    private void updateMessageList(Message message, String peerId) {
+        if (message != null && peerId != null) {
             messageArrayList.add(message);
             mAdapter.notifyDataSetChanged();
             if (mAdapter.getItemCount() > 1) {
@@ -261,7 +286,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("user_id", BaseApplication.getInstance().getPrefManager().getUser().getId());
-                params.put("peer_id", friendId);
+                params.put("peer_id", peerId);
                 params.put("message", message);
 
                 Log.e(TAG, "Params: " + params.toString());
@@ -290,7 +315,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void fetchChatThread() {
 
         String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
-        String endPoint = EndPoints.MESSAGES.replace("_ID_", friendId);
+        String endPoint = EndPoints.MESSAGES.replace("_ID_", peerId);
         endPoint = endPoint.replace("_MY_", selfUserId);
         Log.e(TAG, "endPoint: " + endPoint);
 
@@ -302,49 +327,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             public void onResponse(String response) {
                 Log.e(TAG, "response: " + response);
 
-
-                try {
-
-                     messageArrayList.clear();
-                    JSONObject obj = new JSONObject(response);
-
-                    // check for error
-                    if (obj.getBoolean("error") == false) {
-                        JSONArray msgJsonArr = obj.getJSONArray("messages");
-
-                        for (int i = 0; i < msgJsonArr.length(); i++) {
-                            JSONObject msgObj = (JSONObject) msgJsonArr.get(i);
-
-                            String commentText = msgObj.getString("content");
-                            String commentId = msgObj.getString("message_id");
-                            String createdAt = msgObj.getString("created_at");
-                            int type = msgObj.getInt("type");
-
-                            // parse User object
-                            JSONObject userObj = msgObj.getJSONObject("user");
-                            String userId = userObj.getString("user_id");
-                            String userName = userObj.getString("user_name");
-
-                            // TODO - SEND EMAIL ALSO IN RESPONSE
-                            User user = new User(userId, userName, null);
-
-                            Message message = new Message(commentId, commentText, createdAt, user, type);
-                            messageArrayList.add(message);
-
-                        }
-
-                        mAdapter.notifyDataSetChanged();
-                        if (mAdapter.getItemCount() > 1) {
-                            rvChatThread.getLayoutManager().smoothScrollToPosition(rvChatThread, null, mAdapter.getItemCount() - 1);
-                        }
-                    } else {
-                        Toast.makeText(getApplicationContext(), "" + obj.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();
-                    }
-
-                } catch (JSONException e) {
-                    Log.e(TAG, "json parsing error: " + e.getMessage());
-                    //Toast.makeText(getApplicationContext(), "json parse error: " + e.getContent(), Toast.LENGTH_SHORT).show();
-                }
+                parseResponseForSentMessage(response);
             }
         }, new Response.ErrorListener() {
 
@@ -359,4 +342,93 @@ public class ChatRoomActivity extends AppCompatActivity {
         BaseApplication.getInstance().addToRequestQueue(strReq);
     }
 
+    // Attach image
+    private void chooseImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), RC_PICK_IMAGE);
+    }
+
+    private void chooseVideo() {
+        Intent intent = new Intent();
+        intent.setType("video/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select a Video "), RC_SELECT_VIDEO);
+    }
+
+    private void invokeImageUploadTask(int type) {
+        String userId = BaseApplication.getInstance().getPrefManager().getUser().getId();
+        String[] params = new String[]{uploadFile, EndPoints.UPLOAD_FILE, userId, peerId, String.valueOf(type)};
+        new UploadImageAsyncTask().execute(params);
+    }
+
+    /**
+     * Inner class -- AsyncTask to upload image
+     */
+    class UploadImageAsyncTask extends AsyncTask<String, Void, String> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(ChatRoomActivity.this, "Uploading...", "Please wait...", false, false);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            return FileUploadUtils.uploadFile(params[0], params[1], params[2], params[3], params[4]);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            progressDialog.dismiss();
+
+            parseResponseForSentMessage(result);
+        }
+    }
+
+    private void parseResponseForSentMessage(String response) {
+        try {
+            JSONObject obj = new JSONObject(response);
+
+            // check for error
+            if (obj.getBoolean("error") == false) {
+                JSONArray msgJsonArr = obj.getJSONArray("messages");
+
+                for (int i = 0; i < msgJsonArr.length(); i++) {
+                    JSONObject msgObj = (JSONObject) msgJsonArr.get(i);
+
+                    String commentText = msgObj.getString("content");
+                    String commentId = msgObj.getString("message_id");
+                    String createdAt = msgObj.getString("created_at");
+                    int type = msgObj.getInt("type");
+
+                    // parse User object
+                    JSONObject userObj = msgObj.getJSONObject("user");
+                    String userId = userObj.getString("user_id");
+                    String userName = userObj.getString("user_name");
+
+                    // TODO - SEND EMAIL ALSO IN RESPONSE
+                    User user = new User(userId, userName, null);
+
+                    Message message = new Message(commentId, commentText, createdAt, user, type);
+                    messageArrayList.add(message);
+                }
+
+                mAdapter.notifyDataSetChanged();
+                if (mAdapter.getItemCount() > 1) {
+                    rvChatThread.getLayoutManager().smoothScrollToPosition(rvChatThread, null, mAdapter.getItemCount() - 1);
+                }
+            } else {
+                Toast.makeText(getApplicationContext(), "" + obj.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();
+            }
+
+        } catch (JSONException e) {
+            Log.e(TAG, "json parsing error: " + e.getMessage());
+            //Toast.makeText(getApplicationContext(), "json parse error: " + e.getContent(), Toast.LENGTH_SHORT).show();
+        }
+    }
 }
