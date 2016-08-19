@@ -1,14 +1,18 @@
 package com.iwebnext.vchatt.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -59,15 +63,17 @@ public class ChatRoomActivity extends AppCompatActivity {
     private static final int RC_PICK_IMAGE = 1;
     private static final int RC_SELECT_VIDEO = 2;
 
-    private String peerId;
-    private RecyclerView rvChatThread;
+    private String mUserId;
+    private String mUserName;
+    private String mPeerId;
+    private RecyclerView mRvChatThread;
     private ChatRoomThreadAdapter mAdapter;
-    private ArrayList<Message> messageArrayList;
+    private ArrayList<Message> mMessageArrayList;
     private BroadcastReceiver mRegistrationBroadcastReceiver;
-    private EditText inputMessage;
-    private Button btnSend;
+    private EditText mInputMessage;
+    private Button mBtnSend;
 
-    String uploadFile;
+    String mUploadFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +81,10 @@ public class ChatRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_room);
 
         final Intent intent = getIntent();
-        peerId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
+        mPeerId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
         String title = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_NAME);
 
-        if (peerId == null) {
+        if (mPeerId == null) {
             Toast.makeText(getApplicationContext(), "Chat room not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -87,24 +93,26 @@ public class ChatRoomActivity extends AppCompatActivity {
         toolbar.setTitle(title);
         setSupportActionBar(toolbar);
 
-        inputMessage = (EditText) findViewById(R.id.message);
-        btnSend = (Button) findViewById(R.id.btn_send);
+        mInputMessage = (EditText) findViewById(R.id.message);
+        mBtnSend = (Button) findViewById(R.id.btn_send);
 
-        rvChatThread = (RecyclerView) findViewById(R.id.recycler_view);
+        mRvChatThread = (RecyclerView) findViewById(R.id.recycler_view);
 
-        messageArrayList = new ArrayList<>();
+        mMessageArrayList = new ArrayList<>();
 
-        // self user id is to identify the message owner
-        String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
+        // host user
+        User user = BaseApplication.getInstance().getPrefManager().getUser();
+        mUserId = user.getId();
+        mUserName = user.getName();
 
-        mAdapter = new ChatRoomThreadAdapter(this, messageArrayList, selfUserId);
+        mAdapter = new ChatRoomThreadAdapter(this, mMessageArrayList, mUserId);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        rvChatThread.setLayoutManager(layoutManager);
-        rvChatThread.setItemAnimator(new DefaultItemAnimator());
+        mRvChatThread.setLayoutManager(layoutManager);
+        mRvChatThread.setItemAnimator(new DefaultItemAnimator());
 
         Log.i(TAG, "madapter" + mAdapter);
-        rvChatThread.setAdapter(mAdapter);
+        mRvChatThread.setAdapter(mAdapter);
 
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -116,7 +124,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         };
 
-        btnSend.setOnClickListener(new View.OnClickListener() {
+        mBtnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendMessage();
@@ -137,7 +145,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 type = Message.VIDEO;
             }
             Uri filePath = data.getData();
-            uploadFile = FilePathUtils.getPath(ChatRoomActivity.this, filePath);
+            mUploadFile = FilePathUtils.getPath(ChatRoomActivity.this, filePath);
 
             invokeImageUploadTask(type);
         }
@@ -153,6 +161,31 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        FileUploadUtils.PERMISSIONS_REQUEST_READ_MEDIA);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }
         Intent intent;
         switch (item.getItemId()) {
             case R.id.action_logout:
@@ -199,10 +232,10 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private void updateMessageList(Message message, String peerId) {
         if (message != null && peerId != null) {
-            messageArrayList.add(message);
+            mMessageArrayList.add(message);
             mAdapter.notifyDataSetChanged();
             if (mAdapter.getItemCount() > 1) {
-                rvChatThread.getLayoutManager().smoothScrollToPosition(rvChatThread, null, mAdapter.getItemCount() - 1);
+                mRvChatThread.getLayoutManager().smoothScrollToPosition(mRvChatThread, null, mAdapter.getItemCount() - 1);
             }
         }
     }
@@ -213,7 +246,7 @@ public class ChatRoomActivity extends AppCompatActivity {
      * to all the devices as push notification
      */
     private void sendMessage() {
-        final String message = this.inputMessage.getText().toString().trim();
+        final String message = this.mInputMessage.getText().toString().trim();
 
         if (TextUtils.isEmpty(message)) {
             Toast.makeText(getApplicationContext(), "Enter a message", Toast.LENGTH_SHORT).show();
@@ -224,11 +257,17 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         Log.e(TAG, "endpoint: " + endPoint);
 
-        this.inputMessage.setText("");
+        this.mInputMessage.setText("");
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 endPoint, new Response.Listener<String>() {
-
+            //            "error": false,
+//                    "message": {
+//                "content": "hey tweety",
+//                        "message_id": 888,
+//                        "created_at": "2016-08-19 05:21:40",
+//                        "type": 0
+//            }
             @Override
             public void onResponse(String response) {
                 Log.e(TAG, "response: " + response);
@@ -237,31 +276,25 @@ public class ChatRoomActivity extends AppCompatActivity {
                     JSONObject obj = new JSONObject(response);
 
                     // check for error
-                    if (obj.getBoolean("error") == false) {
+                    if (!obj.getBoolean("error")) {
+
                         JSONObject msgObj = obj.getJSONObject("message");
 
                         String msgId = msgObj.getString("message_id");
                         String content = msgObj.getString("content");
                         String createdAt = msgObj.getString("created_at");
+                        int type = msgObj.getInt("type");
 
-                        JSONObject userObj = obj.getJSONObject("user");
-                        String userId = userObj.getString("user_id");
-                        String userName = userObj.getString("name");
-                        String userEmail = userObj.getString("email");
-                        User user = new User(userId, userName, userEmail);
+                        // since it is a sent message, userId and userName should be that of Host's
+                        Message message = new Message(msgId, content, createdAt, mUserId, mUserName, type);
 
-                        // TODO - Make one single API to upload video/image or text
-                        // For now hard coding it to Type TEXT
-                        Message message = new Message(msgId, content, createdAt, user, Message.TEXT);
-
-                        messageArrayList.add(message);
+                        mMessageArrayList.add(message);
 
                         mAdapter.notifyDataSetChanged();
                         if (mAdapter.getItemCount() > 1) {
                             // scrolling to bottom of the recycler view
-                            rvChatThread.getLayoutManager().smoothScrollToPosition(rvChatThread, null, mAdapter.getItemCount() - 1);
+                            mRvChatThread.getLayoutManager().smoothScrollToPosition(mRvChatThread, null, mAdapter.getItemCount() - 1);
                         }
-
                     } else {
                         Toast.makeText(getApplicationContext(), "" + obj.getString("message"), Toast.LENGTH_LONG).show();
                     }
@@ -278,7 +311,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 NetworkResponse networkResponse = error.networkResponse;
                 Log.e(TAG, "Network error: " + error.getMessage() + ", code: " + networkResponse);
                 Toast.makeText(getApplicationContext(), "Volley error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                inputMessage.setText(message);
+                mInputMessage.setText(message);
             }
         }) {
 
@@ -286,7 +319,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("user_id", BaseApplication.getInstance().getPrefManager().getUser().getId());
-                params.put("peer_id", peerId);
+                params.put("peer_id", mPeerId);
                 params.put("message", message);
 
                 Log.e(TAG, "Params: " + params.toString());
@@ -315,7 +348,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void fetchChatThread() {
 
         String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
-        String endPoint = EndPoints.MESSAGES.replace("_ID_", peerId);
+        String endPoint = EndPoints.MESSAGES.replace("_ID_", mPeerId);
         endPoint = endPoint.replace("_MY_", selfUserId);
         Log.e(TAG, "endPoint: " + endPoint);
 
@@ -327,7 +360,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             public void onResponse(String response) {
                 Log.e(TAG, "response: " + response);
 
-                parseResponseForSentMessage(response);
+                parseMessageList(response);
             }
         }, new Response.ErrorListener() {
 
@@ -359,7 +392,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private void invokeImageUploadTask(int type) {
         String userId = BaseApplication.getInstance().getPrefManager().getUser().getId();
-        String[] params = new String[]{uploadFile, EndPoints.UPLOAD_FILE, userId, peerId, String.valueOf(type)};
+        String[] params = new String[]{mUploadFile, EndPoints.UPLOAD_FILE, userId, mPeerId, String.valueOf(type)};
         new UploadImageAsyncTask().execute(params);
     }
 
@@ -386,11 +419,36 @@ public class ChatRoomActivity extends AppCompatActivity {
             super.onPostExecute(result);
             progressDialog.dismiss();
 
-            parseResponseForSentMessage(result);
+            parserMediaResponse(result);
         }
     }
 
-    private void parseResponseForSentMessage(String response) {
+    private void parserMediaResponse(String response) {
+        try {
+            JSONObject obj = new JSONObject(response);
+            if (obj.getBoolean("error") == false) {
+                JSONObject msgObj = obj.getJSONObject("message");
+
+                String content = msgObj.getString("content");
+                String commentId = msgObj.getString("message_id");
+                String createdAt = msgObj.getString("created_at");
+                int type = msgObj.getInt("type");
+
+                Message message = new Message(commentId, content, createdAt, mUserId, mUserName, type);
+                mMessageArrayList.add(message);
+
+                mAdapter.notifyDataSetChanged();
+                if (mAdapter.getItemCount() > 1) {
+                    mRvChatThread.getLayoutManager().smoothScrollToPosition(mRvChatThread, null, mAdapter.getItemCount() - 1);
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void parseMessageList(String response) {
         try {
             JSONObject obj = new JSONObject(response);
 
@@ -401,7 +459,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 for (int i = 0; i < msgJsonArr.length(); i++) {
                     JSONObject msgObj = (JSONObject) msgJsonArr.get(i);
 
-                    String commentText = msgObj.getString("content");
+                    String content = msgObj.getString("content");
                     String commentId = msgObj.getString("message_id");
                     String createdAt = msgObj.getString("created_at");
                     int type = msgObj.getInt("type");
@@ -411,16 +469,13 @@ public class ChatRoomActivity extends AppCompatActivity {
                     String userId = userObj.getString("user_id");
                     String userName = userObj.getString("user_name");
 
-                    // TODO - SEND EMAIL ALSO IN RESPONSE
-                    User user = new User(userId, userName, null);
-
-                    Message message = new Message(commentId, commentText, createdAt, user, type);
-                    messageArrayList.add(message);
+                    Message message = new Message(commentId, content, createdAt, userId, userName, type);
+                    mMessageArrayList.add(message);
                 }
 
                 mAdapter.notifyDataSetChanged();
                 if (mAdapter.getItemCount() > 1) {
-                    rvChatThread.getLayoutManager().smoothScrollToPosition(rvChatThread, null, mAdapter.getItemCount() - 1);
+                    mRvChatThread.getLayoutManager().smoothScrollToPosition(mRvChatThread, null, mAdapter.getItemCount() - 1);
                 }
             } else {
                 Toast.makeText(getApplicationContext(), "" + obj.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();

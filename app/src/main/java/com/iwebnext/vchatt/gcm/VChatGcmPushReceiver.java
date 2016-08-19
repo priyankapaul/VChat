@@ -36,9 +36,9 @@ import com.iwebnext.vchatt.utils.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MyGcmPushReceiver extends GcmListenerService {
+public class VChatGcmPushReceiver extends GcmListenerService {
 
-    private static final String TAG = MyGcmPushReceiver.class.getSimpleName();
+    private static final String TAG = VChatGcmPushReceiver.class.getSimpleName();
 
 
     private NotificationUtils notificationUtils;
@@ -85,10 +85,21 @@ public class MyGcmPushReceiver extends GcmListenerService {
                 break;
             case Config.PUSH_TYPE_USER:
                 // push notification is specific to user
-                processUserMessage(title, isBackground, data);
+//                processUserMessage(title, isBackground, data);
                 break;
         }
     }
+
+//    "message":{
+//        "created_at":"2016-08-19 05:19:06",
+//                "message_id":887,
+//                "type":0,
+//                "content":"ffdfdfdfd"
+//    },
+//            "user":{
+//        "user_id":144,
+//                "user_name":"priyanka"
+//    }
 
     /**
      * Processing chat room push message
@@ -99,8 +110,6 @@ public class MyGcmPushReceiver extends GcmListenerService {
 
             try {
                 JSONObject datObj = new JSONObject(data);
-
-                String friendId = datObj.getString("$peer_id");
 
                 JSONObject uObj = datObj.getJSONObject("user");
 
@@ -113,26 +122,17 @@ public class MyGcmPushReceiver extends GcmListenerService {
                 }
 
                 String userId = uObj.getString("user_id");
-                String name = uObj.getString("name");
-                String email = uObj.getString("email");
-                User user = new User(userId, name, email);
+                String userName = uObj.getString("user_name");
 
                 Message message = null;
                 JSONObject msgObj = datObj.getJSONObject("message");
 
-                boolean error = msgObj.getBoolean("error");
-                if (!error) {
-                    String msgId = msgObj.getString("message_id");
-                    String content = msgObj.getString("content");
-                    String createdAt = msgObj.getString("created_at");
+                String msgId = msgObj.getString("message_id");
+                String content = msgObj.getString("content");
+                String createdAt = msgObj.getString("created_at");
+                int type = msgObj.getInt("type");
 
-                    // TODO - Make one single API to upload video/image or text
-                    // For now hard coding it to Type TEXT
-                    message = new Message(msgId, content, createdAt, user, Message.TEXT);
-                } else {
-                    // TODO - what if message is returns in error=true
-                    message = new Message(null, null, null, user, Message.TEXT);
-                }
+                message = new Message(msgId, content, createdAt, userId, userName, type);
 
                 // verifying whether the app is in background or foreground
                 if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
@@ -141,7 +141,7 @@ public class MyGcmPushReceiver extends GcmListenerService {
                     Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
                     pushNotification.putExtra("type", Config.PUSH_TYPE_CHATROOM);
                     pushNotification.putExtra("message", message);
-                    pushNotification.putExtra(Constants.EXTRA_KEY_FRIEND_ID, friendId);
+                    pushNotification.putExtra(Constants.EXTRA_KEY_FRIEND_ID, userId);
                     LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
 
                     // play notification sound
@@ -151,8 +151,8 @@ public class MyGcmPushReceiver extends GcmListenerService {
 
                     // app is in background. show the message in notification try
                     Intent resultIntent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-                    resultIntent.putExtra(Constants.EXTRA_KEY_FRIEND_ID, friendId);
-                    showNotificationMessage(getApplicationContext(), title, user.getName() + " : " + message.getContent(), message.getCreatedAt(), resultIntent);
+                    resultIntent.putExtra(Constants.EXTRA_KEY_FRIEND_ID, userId);
+                    showNotificationMessage(getApplicationContext(), title, userName + " : " + message.getContent(), message.getCreatedAt(), resultIntent);
                 }
 
             } catch (JSONException e) {
@@ -170,74 +170,74 @@ public class MyGcmPushReceiver extends GcmListenerService {
      * Processing user specific push message
      * It will be displayed with / without nivUser in push notification tray
      */
-    private void processUserMessage(String title, boolean isBackground, String data) {
-        if (!isBackground) {
-
-            try {
-                JSONObject datObj = new JSONObject(data);
-
-                String imageUrl = datObj.getString("image");
-
-                JSONObject uObj = datObj.getJSONObject("user");
-
-                String userId = uObj.getString("user_id");
-                String name = uObj.getString("name");
-                String email = uObj.getString("email");
-                User user = new User(userId, name, email);
-
-                Message message = null;
-                JSONObject msgObj = datObj.getJSONObject("message");
-
-                boolean error = msgObj.getBoolean("error");
-                if (!error) {
-                    String msgId = msgObj.getString("message_id");
-                    // TODO - not sure to be created with image or not
-                    String content = msgObj.getString("content");
-                    String createdAt = msgObj.getString("created_at");
-
-                    // TODO - Make one single API to upload video/image or text
-                    message = new Message(msgId, imageUrl, createdAt, user, Message.IMAGE);
-                } else {
-                    // TODO - what if message is returns in error=true
-                    message = new Message(null, null, null, user, Message.IMAGE);
-                }
-
-                // verifying whether the app is in background or foreground
-                if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
-
-                    // app is in foreground, broadcast the push message
-                    Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
-                    pushNotification.putExtra("type", Config.PUSH_TYPE_USER);
-                    pushNotification.putExtra("message", message);
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
-
-                    // play notification sound
-                    NotificationUtils notificationUtils = new NotificationUtils();
-                    notificationUtils.playNotificationSound();
-                } else {
-
-                    // app is in background. show the message in notification try
-                    Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
-
-                    // check for push notification nivUser attachment
-                    if (TextUtils.isEmpty(imageUrl)) {
-                        showNotificationMessage(getApplicationContext(), title, user.getName() + " : " + message.getContent(), message.getCreatedAt(), resultIntent);
-                    } else {
-                        // push notification contains nivUser
-                        // show it with the nivUser
-                        showNotificationMessageWithBigImage(getApplicationContext(), title, message.getContent(), message.getCreatedAt(), resultIntent, imageUrl);
-                    }
-                }
-            } catch (JSONException e) {
-                Log.e(TAG, "json parsing error: " + e.getMessage());
-                Toast.makeText(getApplicationContext(), "Json parse error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            }
-
-        } else {
-            // the push notification is silent, may be other operations needed
-            // like inserting it in to SQLite
-        }
-    }
+//    private void processUserMessage(String title, boolean isBackground, String data) {
+//        if (!isBackground) {
+//
+//            try {
+//                JSONObject datObj = new JSONObject(data);
+//
+//                String imageUrl = datObj.getString("image");
+//
+//                JSONObject uObj = datObj.getJSONObject("user");
+//
+//                String userId = uObj.getString("user_id");
+//                String name = uObj.getString("name");
+//                String email = uObj.getString("email");
+//                User user = new User(userId, name, email);
+//
+//                Message message = null;
+//                JSONObject msgObj = datObj.getJSONObject("message");
+//
+//                boolean error = msgObj.getBoolean("error");
+//                if (!error) {
+//                    String msgId = msgObj.getString("message_id");
+//                    // TODO - not sure to be created with image or not
+//                    String content = msgObj.getString("content");
+//                    String createdAt = msgObj.getString("created_at");
+//
+//                    // TODO - Make one single API to upload video/image or text
+//                    message = new Message(msgId, imageUrl, createdAt, user, Message.IMAGE);
+//                } else {
+//                    // TODO - what if message is returns in error=true
+//                    message = new Message(null, null, null, user, Message.IMAGE);
+//                }
+//
+//                // verifying whether the app is in background or foreground
+//                if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
+//
+//                    // app is in foreground, broadcast the push message
+//                    Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
+//                    pushNotification.putExtra("type", Config.PUSH_TYPE_USER);
+//                    pushNotification.putExtra("message", message);
+//                    LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
+//
+//                    // play notification sound
+//                    NotificationUtils notificationUtils = new NotificationUtils();
+//                    notificationUtils.playNotificationSound();
+//                } else {
+//
+//                    // app is in background. show the message in notification try
+//                    Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
+//
+//                    // check for push notification nivUser attachment
+//                    if (TextUtils.isEmpty(imageUrl)) {
+//                        showNotificationMessage(getApplicationContext(), title, user.getName() + " : " + message.getContent(), message.getCreatedAt(), resultIntent);
+//                    } else {
+//                        // push notification contains nivUser
+//                        // show it with the nivUser
+//                        showNotificationMessageWithBigImage(getApplicationContext(), title, message.getContent(), message.getCreatedAt(), resultIntent, imageUrl);
+//                    }
+//                }
+//            } catch (JSONException e) {
+//                Log.e(TAG, "json parsing error: " + e.getMessage());
+//                Toast.makeText(getApplicationContext(), "Json parse error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+//            }
+//
+//        } else {
+//            // the push notification is silent, may be other operations needed
+//            // like inserting it in to SQLite
+//        }
+//    }
 
     /**
      * Showing notification with text only

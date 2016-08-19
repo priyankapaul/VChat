@@ -21,9 +21,9 @@ import android.util.Log;
 
 import com.google.android.gms.iid.InstanceIDListenerService;
 
-public class MyInstanceIDListenerService extends InstanceIDListenerService {
+public class VchatInstanceIDListenerService extends InstanceIDListenerService {
 
-    private static final String TAG = MyInstanceIDListenerService.class.getSimpleName();
+    private static final String TAG = VchatInstanceIDListenerService.class.getSimpleName();
 
     /**
      * Called if InstanceID token is updated. This may occur if the security of

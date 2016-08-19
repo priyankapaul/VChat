@@ -85,7 +85,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
     @Override
     public int getItemViewType(int position) {
         Message message = messageArrayList.get(position);
-        if (message.getUser().getId().equals(userId)) {
+        if (message.getUserId().equals(userId)) {
             return SELF;
         }
 
@@ -98,7 +98,7 @@ public class ChatRoomThreadAdapter extends RecyclerView.Adapter<ChatRoomThreadAd
 
         int type = message.getType();
 
-        holder.tvTimeStamp.setText(message.getUser().getName() + ", " + getTimeStamp(message.getCreatedAt()));
+        holder.tvTimeStamp.setText(message.getUserName() + ", " + getTimeStamp(message.getCreatedAt()));
         if (type == Message.TEXT) {
             holder.tvTextMsg.setVisibility(View.VISIBLE);
             holder.ivImgSent.setVisibility(View.GONE);

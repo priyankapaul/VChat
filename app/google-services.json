@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "946029936911",
-    "project_id": "firebase-vchatt"
+    "project_number": "921559761135",
+    "project_id": "vchatt-140719"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:946029936911:android:2ff26cf9540dc3ce",
+        "mobilesdk_app_id": "1:921559761135:android:2ff26cf9540dc3ce",
         "android_client_info": {
           "package_name": "com.iwebnext.vchatt"
         }
       },
       "oauth_client": [
         {
-          "client_id": "946029936911-el7a5q0uublmodhpjh2k7vl1cgtnurq1.apps.googleusercontent.com",
+          "client_id": "921559761135-j55s0m2t3cl4s83ssifhvbebvtkr5pvk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.iwebnext.vchatt",
-            "certificate_hash": "7B3C875C366287816F696436967F5A63E4128D0F"
+            "certificate_hash": "E1D22826DEF4F0BE87AD8CFB3D8060F53AC15A24"
           }
         },
         {
-          "client_id": "946029936911-dhb9ua5cfdm7j2e5861230jkdjpgb45k.apps.googleusercontent.com",
+          "client_id": "921559761135-358hgr49j33bnq68428ebs2jmajmrvq6.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC9TiV69XvDSSwwEMCptG5qN41cFFwp3rU"
+          "current_key": "AIzaSyBxMxVPLc65s05Q9x8XIYVTQmhP50HPYl0"
         }
       ],
       "services": {

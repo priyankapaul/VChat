@@ -10,15 +10,25 @@ public class Message implements Serializable {
     public static int VIDEO = 2;
 
     String id, content, createdAt;
+    String userId;
+    String userName;
     int type;
 
-    User user;
-
-    public Message(String id, String content, String createdAt, User user, int type) {
+    /**
+     * Message constructor
+     *
+     * @param id
+     * @param content
+     * @param createdAt
+     * @param userId
+     * @param type
+     */
+    public Message(String id, String content, String createdAt, String userId, String userName, int type) {
         this.id = id;
         this.content = content;
         this.createdAt = createdAt;
-        this.user = user;
+        this.userId = userId;
+        this.userName = userName;
         this.type = type;
     }
 
@@ -26,39 +36,23 @@ public class Message implements Serializable {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public int getType() {
         return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public String getUserId() {
+        return userId;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+    public String getUserName() {
+        return userName;
     }
 }
