@@ -4,12 +4,14 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -20,7 +22,6 @@ import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -71,28 +72,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
-
-    private static final int TIME_OUT = 3000;
+    private static final String TAG = LoginActivity.class.getSimpleName();
 
     private static final int RC_VCHAT_REGISTER = 1234;
     private static final int RC_GPLUS_SIGN_IN = 100;
 
     private ProgressDialog progressDialog;
 
-    private SharedPreferences mPrefs;
-    private String TAG = LoginActivity.class.getSimpleName();
     private EditText inputPassword;
     private EditText inputEmail;
-    private Button btnEnter;
-    private TextView tvSignUp, tvForgetPassword;
     private DotProgressBar progressBar;
 
     // type = 0 for Normal User, type = 1 for Facebook, type = 2 for GPlus
     private String userType;
 
-    //google api client
-    private SignInButton btnSignInGPlus;
-    private GoogleSignInOptions googleSignInOptions;
     private GoogleApiClient mGoogleApiClient;
     GoogleSignInAccount googleSignInAccount;
 
@@ -166,7 +159,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         /*
         Configuration - Google Sign In
          */
-        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
 
@@ -177,19 +170,21 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .build();
 
 
-        btnSignInGPlus = (SignInButton) findViewById(R.id.login_gplus_button);
-        btnSignInGPlus.setSize(SignInButton.SIZE_WIDE);
-        btnSignInGPlus.setScopes(googleSignInOptions.getScopeArray());
+        SignInButton btnSignInGPlus = (SignInButton) findViewById(R.id.login_gplus_button);
+        if (btnSignInGPlus != null) {
+            btnSignInGPlus.setSize(SignInButton.SIZE_WIDE);
+            btnSignInGPlus.setScopes(googleSignInOptions.getScopeArray());
+            btnSignInGPlus.setOnClickListener(new View.OnClickListener() {
 
-        btnSignInGPlus.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                gPlusSignIn();
-            }
+                @Override
+                public void onClick(View v) {
+                    gPlusSignIn();
+                }
 
 
-        });
+            });
+        }
+
         // Google SignIn configuration done
 
         // welcome view
@@ -199,45 +194,50 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         inputEmail = (EditText) findViewById(R.id.input_email);
         inputPassword = (EditText) findViewById(R.id.input_password);
-        btnEnter = (Button) findViewById(R.id.btn_enter);
+        Button btnEnter = (Button) findViewById(R.id.btn_enter);
 
-        tvSignUp = (TextView) findViewById(R.id.tv_sign_up);
-        tvForgetPassword = (TextView) findViewById(R.id.tv_forget_password);
+        TextView tvSignUp = (TextView) findViewById(R.id.tv_sign_up);
+        TextView tvForgetPassword = (TextView) findViewById(R.id.tv_forget_password);
         progressBar = (DotProgressBar) findViewById(R.id.login_progress_bar);
         inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
 
         // configure controls
         inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
 
-        tvForgetPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        if (tvForgetPassword != null) {
+            tvForgetPassword.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                Intent forgetIntent = new Intent(LoginActivity.this, ForgetPasswordActivity.class);
-                LoginActivity.this.startActivity(forgetIntent);
-            }
-        });
+                    Intent forgetIntent = new Intent(LoginActivity.this, ForgetPasswordActivity.class);
+                    LoginActivity.this.startActivity(forgetIntent);
+                }
+            });
+        }
 
 
-        tvSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        if (tvSignUp != null) {
+            tvSignUp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                Intent registerIntent = new Intent(LoginActivity.this, SignUpActivity.class);
-                LoginActivity.this.startActivityForResult(registerIntent, RC_VCHAT_REGISTER);
-            }
-        });
+                    Intent registerIntent = new Intent(LoginActivity.this, SignUpActivity.class);
+                    LoginActivity.this.startActivityForResult(registerIntent, RC_VCHAT_REGISTER);
+                }
+            });
+        }
 
-        btnEnter.setOnClickListener(new View.OnClickListener() {
+        if (btnEnter != null) {
+            btnEnter.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View view) {
-                progressBar.setVisibility(View.GONE);
-                login();
+                @Override
+                public void onClick(View view) {
+                    progressBar.setVisibility(View.GONE);
+                    login();
 
-            }
-        });
-
+                }
+            });
+        }
     }
 
     /*
@@ -289,10 +289,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 md.update(signature.toByteArray());
                 Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
-        } catch (PackageManager.NameNotFoundException e) {
-
-        } catch (NoSuchAlgorithmException e) {
-
+        } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException e) {
+            Log.i(TAG, "HashKey exception: " + e.getMessage());
         }
     }
 
@@ -315,12 +313,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
     };
 
-    private void displayMessage(Profile profile) {
-        if (profile != null) {
-            //extra
-        }
-    }
-
     private void loginWithFBProfile(final Profile profile) {
         if (profile != null) {
 
@@ -331,8 +323,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         @Override
                         public void onCompleted(JSONObject object, GraphResponse response) {
                             Log.v("LoginActivity", response.toString());
-                            String email = object.optString("email");
-                            emailSocial = email;
+                            emailSocial = object.optString("email");
                             // String birthday = object.getString("birthday"); // 01/31/1980 format
 
                             Profile profile = Profile.getCurrentProfile();
@@ -394,7 +385,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             public void onErrorResponse(VolleyError error) {
                 dismissProgress();
                 Log.i(TAG, "lookup request error: " + error);
-                if (error.equals("Volley Timeout Error"))
+                if (error.getMessage().equals("Volley Timeout Error"))
                     Toast.makeText(LoginActivity.this, "Server is not reachable", Toast.LENGTH_SHORT).show();
             }
         });
@@ -492,7 +483,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     JSONObject obj = new JSONObject(response);
 
                     // check for error flag
-                    if (obj.getBoolean("error") == false) {
+                    if (!obj.getBoolean("error")) {
                         // user successfully logged in
 
                         JSONObject userObj = obj.getJSONObject("user");
@@ -504,6 +495,18 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         BaseApplication.getInstance().getPrefManager().storeUser(user);
                         BaseApplication.getInstance().getPrefManager().setUserType(Constants.USER_TYPE_NORMAL);
 
+                        // check if app_usage_expired is set, and show AppExpireActivity accordingly
+                        boolean hasAppUsageExpired = userObj.getBoolean("app_usage_expired");
+
+                        if (hasAppUsageExpired) {
+                            Toast.makeText(getApplicationContext(), "Your trial period for this app has expired",
+                                    Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(getApplicationContext(), AppExpireActivity.class);
+                            startActivity(i);
+
+                            return;
+                        }
+
                         // Show home screen
                         showHomeScreen();
                     } else {
@@ -513,11 +516,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
                 } catch (JSONException e) {
                     Log.e(TAG, "json parsing error: " + e.getMessage());
-                   // Toast.makeText(getApplicationContext(), "Json parse error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Toast.makeText(getApplicationContext(), "your trial period for this app has espired",
-                            Toast.LENGTH_LONG).show();
-                    Intent i = new Intent(getApplicationContext(), AppExpireActivity.class);
-                    startActivity(i);
+                    // Toast.makeText(getApplicationContext(), "Json parse error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {
@@ -640,8 +639,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     public void onResume() {
         super.onResume();
-        Profile profile = Profile.getCurrentProfile();
-        displayMessage(profile);
     }
 
     private void showHomeScreen() {
