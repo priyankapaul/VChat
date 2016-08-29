@@ -424,6 +424,10 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     private void parserMediaResponse(String response) {
+        if (response == null) {
+            Toast.makeText(this, "Failed to upload!", Toast.LENGTH_SHORT);
+            return;
+        }
         try {
             JSONObject obj = new JSONObject(response);
             if (obj.getBoolean("error") == false) {

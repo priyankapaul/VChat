@@ -236,8 +236,10 @@ public class FileUploadUtils {
             dataOutputStream.flush();
             dataOutputStream.close();
         } catch (MalformedURLException ex) {
+            Log.i(TAG, "Fileutils MalformedURLException");
             ex.printStackTrace();
         } catch (Exception e) {
+            Log.i(TAG, "Fileutils Exception");
             e.printStackTrace();
         }
 
@@ -253,10 +255,10 @@ public class FileUploadUtils {
                 rd.close();
             } catch (IOException ioex) {
             }
-            Log.i(TAG, sb.toString());
+            Log.i(TAG, "Fileutils response -> " + sb.toString());
             return sb.toString();
         } else {
-            return "Could not upload";
+            return null;
         }
     }
 }
