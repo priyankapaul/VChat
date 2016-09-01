@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +46,7 @@ import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.github.silvestrpredko.dotprogressbar.DotProgressBar;
@@ -130,7 +132,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         accessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldToken, AccessToken newToken) {
-
+                accessToken = newToken;
             }
         };
         profileTracker = new ProfileTracker() {
@@ -200,6 +202,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         TextView tvForgetPassword = (TextView) findViewById(R.id.tv_forget_password);
         progressBar = (DotProgressBar) findViewById(R.id.login_progress_bar);
         inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
+        ScrollView scrollView = (ScrollView) findViewById(R.id.scroll);
 
         // configure controls
         inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
@@ -232,7 +235,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
                 @Override
                 public void onClick(View view) {
-                    progressBar.setVisibility(View.GONE);
+
                     login();
 
                 }
@@ -316,13 +319,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private void loginWithFBProfile(final Profile profile) {
         if (profile != null) {
 
-
+            Log.i(TAG, "loginWithFBProfile ::: access token = " + accessToken);
             GraphRequest request = GraphRequest.newMeRequest(
                     accessToken,
                     new GraphRequest.GraphJSONObjectCallback() {
                         @Override
                         public void onCompleted(JSONObject object, GraphResponse response) {
-                            Log.v("LoginActivity", response.toString());
+                            Log.d("LoginActivity", response.toString());
                             emailSocial = object.optString("email");
                             // String birthday = object.getString("birthday"); // 01/31/1980 format
 
@@ -360,11 +363,25 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         String type = userObj.getString("type");
                         User user = new User(userId, name, email);
 
-                        BaseApplication.getInstance().getPrefManager().storeUser(user);
-                        BaseApplication.getInstance().getPrefManager().setUserType(type);
+                        boolean hasAppUsageExpired = userObj.getBoolean("app_usage_expired");
 
-                        // Show home screen
-                        showHomeScreen();
+                        if (hasAppUsageExpired) {
+                            Intent i = new Intent(LoginActivity.this, AppExpireActivity.class);
+                            startActivity(i);
+
+                            if (userType.equals(Constants.USER_TYPE_FACEBOOK)) {
+                                LoginManager.getInstance().logOut();
+                            }
+
+                            // No need to come back to Login Activity again
+                            finish();
+                        } else {
+                            BaseApplication.getInstance().getPrefManager().storeUser(user);
+                            BaseApplication.getInstance().getPrefManager().setUserType(type);
+
+                            // Show home screen
+                            showHomeScreen();
+                        }
                     } else {
                         if (userType.equals(Constants.USER_TYPE_FACEBOOK)) {
                             Profile profile = Profile.getCurrentProfile();
