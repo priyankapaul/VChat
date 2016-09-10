@@ -4,14 +4,11 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -94,7 +91,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     // Used for FB
     private CallbackManager callbackManager;
     private AccessTokenTracker accessTokenTracker;
-    private ProfileTracker profileTracker;
     private AccessToken accessToken;
     String emailSocial;
 
@@ -135,16 +131,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 accessToken = newToken;
             }
         };
-        profileTracker = new ProfileTracker() {
-            @Override
-            protected void onCurrentProfileChanged(Profile oldProfile, Profile newProfile) {
-                if (oldProfile == null && newProfile != null)
-                    loginWithFBProfile(newProfile);
-            }
-        };
 
         accessTokenTracker.startTracking();
-        profileTracker.startTracking();
 
         LoginButton btnFBLogin = (LoginButton) findViewById(R.id.login_fb_button);
 
@@ -293,16 +281,31 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
         } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException e) {
-            Log.i(TAG, "HashKey exception: " + e.getMessage());
+            Log.d(TAG, "HashKey exception: " + e.getMessage());
         }
     }
 
     private FacebookCallback<LoginResult> callback = new FacebookCallback<LoginResult>() {
+        private ProfileTracker profileTracker;
 
         @Override
         public void onSuccess(LoginResult loginResult) {
             accessToken = loginResult.getAccessToken();
-            BaseApplication.getInstance().getPrefManager().storeFBAccessToken(accessToken.getToken());
+            if (Profile.getCurrentProfile() == null) {
+                profileTracker = new ProfileTracker() {
+                    @Override
+                    protected void onCurrentProfileChanged(Profile oldProfile, Profile newProfile) {
+                        loginWithFBProfile(newProfile);
+                        profileTracker.stopTracking();
+                    }
+                };
+                // no need to call startTracking() on profileTracker
+                // because it is called by its constructor, internally.
+            } else {
+                Profile profile = Profile.getCurrentProfile();
+                Log.d(TAG, "getCurrentProfile returns -> " + profile.getFirstName());
+                loginWithFBProfile(profile);
+            }
         }
 
         @Override
@@ -319,7 +322,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private void loginWithFBProfile(final Profile profile) {
         if (profile != null) {
 
-            Log.i(TAG, "loginWithFBProfile ::: access token = " + accessToken);
+            Log.d(TAG, "loginWithFBProfile ::: access token = " + accessToken);
             GraphRequest request = GraphRequest.newMeRequest(
                     accessToken,
                     new GraphRequest.GraphJSONObjectCallback() {
@@ -401,7 +404,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             @Override
             public void onErrorResponse(VolleyError error) {
                 dismissProgress();
-                Log.i(TAG, "lookup request error: " + error);
+                Log.d(TAG, "lookup request error: " + error);
                 if (error.getMessage().equals("Volley Timeout Error"))
                     Toast.makeText(LoginActivity.this, "Server is not reachable", Toast.LENGTH_SHORT).show();
             }
@@ -494,7 +497,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             @Override
             public void onResponse(String response) {
                 progressBar.setVisibility(View.GONE);
-                Log.e(TAG, "response: " + response);
+                Log.d(TAG, "response: " + response);
 
                 try {
                     JSONObject obj = new JSONObject(response);
@@ -553,7 +556,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 params.put("email", email);
                 params.put("password", password);
 
-                Log.e(TAG, "params: " + params.toString());
+                Log.d(TAG, "params: " + params.toString());
                 return params;
             }
         };
@@ -650,7 +653,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public void onStop() {
         super.onStop();
         accessTokenTracker.stopTracking();
-        profileTracker.stopTracking();
     }
 
     @Override
@@ -674,7 +676,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     private void dismissProgress() {
-        if (progressDialog != null && progressDialog.isShowing())
+        if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.cancel();
+        }
     }
 }
