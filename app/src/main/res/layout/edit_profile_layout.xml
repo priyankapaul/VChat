@@ -34,7 +34,7 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#009ACD"
                 android:textStyle="bold"
-               />
+                />
 
             <FrameLayout
                 android:id="@+id/fl_profile_pic"
@@ -52,19 +52,19 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:src="@drawable/user_img" />
+                    android:src="@drawable/user_circle" />
 
                 <LinearLayout
                     android:layout_width="42dp"
                     android:layout_height="42dp"
                     android:layout_gravity="bottom">
 
-                   <ImageButton
-                       android:layout_width="42dp"
-                       android:id="@+id/change_picture"
-                       android:src="@drawable/plus_green"
-                       android:layout_height="41dp"
-                       />
+                    <ImageButton
+                        android:layout_width="42dp"
+                        android:id="@+id/change_picture"
+                        android:src="@drawable/plus_green"
+                        android:layout_height="41dp"
+                        />
                 </LinearLayout>
 
             </FrameLayout>
@@ -89,13 +89,13 @@
                         android:layout_height="wrap_content"
                         android:src="@drawable/name"
                         />
-                <EditText
-                    android:id="@+id/et_name"
-                    android:paddingLeft="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Name" />
-                    </LinearLayout>
+                    <EditText
+                        android:id="@+id/et_name"
+                        android:paddingLeft="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Name" />
+                </LinearLayout>
                 <LinearLayout
                     android:id="@+id/email_layout"
                     android:layout_width="260dip"
@@ -106,13 +106,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/email"/>
-                <EditText
-                    android:id="@+id/et_email"
-                    android:paddingLeft="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Email" />
-                    </LinearLayout>
+                    <EditText
+                        android:id="@+id/et_email"
+                        android:paddingLeft="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Email" />
+                </LinearLayout>
                 <LinearLayout
                     android:id="@+id/password_layout"
                     android:layout_width="260dip"
@@ -126,11 +126,11 @@
                         android:src="@drawable/pass"/>
 
                     <EditText
-                    android:id="@+id/et_password"
+                        android:id="@+id/et_password"
                         android:paddingLeft="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Password" />
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Password" />
 
                 </LinearLayout>
 
@@ -144,12 +144,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/phone"/>
-                <EditText
-                    android:id="@+id/et_phone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                   android:paddingLeft="10dp"
-                    android:hint="Phone" />
+                    <EditText
+                        android:id="@+id/et_phone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:hint="Phone" />
 
                 </LinearLayout>
                 <LinearLayout
@@ -162,14 +162,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/address"/>
-                <EditText
-                    android:id="@+id/et_address"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                   android:paddingLeft="10dp"
-                    android:hint="Address" />
+                    <EditText
+                        android:id="@+id/et_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:hint="Address" />
 
-                    </LinearLayout>
+                </LinearLayout>
                 <LinearLayout
                     android:id="@+id/medical_license_layout"
                     android:layout_width="260dip"
@@ -180,12 +180,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/medical_license_no"/>
-                <EditText
-                    android:id="@+id/et_medicalLicenseNo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                   android:paddingLeft="10dp"
-                    android:hint="Medical License No" />
+                    <EditText
+                        android:id="@+id/et_medicalLicenseNo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:hint="Medical License No" />
                 </LinearLayout>
                 <LinearLayout
                     android:id="@+id/profession_layout"
@@ -197,12 +197,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/profession"/>
-                <EditText
-                    android:id="@+id/et_profession"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                  android:paddingLeft="10dp"
-                    android:hint="Profession" />
+                    <EditText
+                        android:id="@+id/et_profession"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:hint="Profession" />
                 </LinearLayout>
                 <LinearLayout
                     android:id="@+id/website_layout"
@@ -214,13 +214,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/website"/>
-                <EditText
-                    android:id="@+id/et_website"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                   android:paddingLeft="10dp"
-                    android:hint="Website" />
-                    </LinearLayout>
+                    <EditText
+                        android:id="@+id/et_website"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:hint="Website" />
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout

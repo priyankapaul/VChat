@@ -54,8 +54,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.app.BaseApplication;
+import com.iwebnext.vchatt.helper.AppPreferenceManager;
 import com.iwebnext.vchatt.model.User;
 import com.iwebnext.vchatt.request.SignUpSocialMediaUserRequest;
 import com.iwebnext.vchatt.utils.Constants;
@@ -75,7 +78,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     private static final int RC_VCHAT_REGISTER = 1234;
     private static final int RC_GPLUS_SIGN_IN = 100;
-
+    private AppPreferenceManager pref;
     private ProgressDialog progressDialog;
 
     private EditText inputPassword;
@@ -91,6 +94,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     // Used for FB
     private CallbackManager callbackManager;
     private AccessTokenTracker accessTokenTracker;
+    private ProfileTracker profileTracker;
     private AccessToken accessToken;
     String emailSocial;
 
@@ -132,7 +136,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         };
 
+
         accessTokenTracker.startTracking();
+
 
         LoginButton btnFBLogin = (LoginButton) findViewById(R.id.login_fb_button);
 
@@ -174,13 +180,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             });
         }
-
-        // Google SignIn configuration done
-
-        // welcome view
-//        TextView tx = (TextView) findViewById(R.id.tv_welcome);
-//        Typeface customFont = Typeface.createFromAsset(getAssets(), "fonts/painting_the_light.ttf");
-//        tx.setTypeface(customFont);
 
         inputEmail = (EditText) findViewById(R.id.input_email);
         inputPassword = (EditText) findViewById(R.id.input_password);
@@ -234,6 +233,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     /*
     GPlus integration
      */
+
     private void gPlusSignIn() {
         //Creating an intent
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
@@ -273,15 +273,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         // Add code to print out the key hash
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
-                    "info.vchatt.gcm.activity",
+                    "com.iwebnext.vchatt",
                     PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
+
                 Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
         } catch (PackageManager.NameNotFoundException | NoSuchAlgorithmException e) {
-            Log.d(TAG, "HashKey exception: " + e.getMessage());
+            Log.i(TAG, "HashKey exception: " + e.getMessage());
         }
     }
 
@@ -322,7 +323,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private void loginWithFBProfile(final Profile profile) {
         if (profile != null) {
 
-            Log.d(TAG, "loginWithFBProfile ::: access token = " + accessToken);
+            Log.i(TAG, "loginWithFBProfile ::: access token = " + accessToken);
             GraphRequest request = GraphRequest.newMeRequest(
                     accessToken,
                     new GraphRequest.GraphJSONObjectCallback() {
@@ -375,6 +376,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             if (userType.equals(Constants.USER_TYPE_FACEBOOK)) {
                                 LoginManager.getInstance().logOut();
                             }
+                            if(userType.equals(Constants.USER_TYPE_GPLUS)){
+
+                                googlePlusLogout();
+
+                            }
 
                             // No need to come back to Login Activity again
                             finish();
@@ -421,14 +427,18 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     Response.Listener<String> registerListener = new Response.Listener<String>() {
+
         @Override
         public void onResponse(String response) {
             dismissProgress();
 
             try {
+
                 JSONObject jsonResponse = new JSONObject(response);
+
                 boolean error = jsonResponse.getBoolean("error");
-                if (!error) {
+                if (!error)
+                {
                     String userId = jsonResponse.getString("user_id");
 
                     String name = "";
@@ -443,10 +453,15 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     BaseApplication.getInstance().getPrefManager().storeUser(user);
                     BaseApplication.getInstance().getPrefManager().setUserType(Constants.USER_TYPE_FACEBOOK);
                     showHomeScreen();
-                } else {
+                }
+                else {
+
+                    String errorMsg = jsonResponse.getString("error_msg");
+                    //   Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_SHORT).show();
+
                     AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                     builder.setTitle("Register Failed")
-                            .setMessage("Please try later")
+                            .setMessage(errorMsg)
                             .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -456,6 +471,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             })
                             .create()
                             .show();
+
+                    if (userType.equals(Constants.USER_TYPE_FACEBOOK)) {
+                        LoginManager.getInstance().logOut();
+                    }
+                    if(userType.equals(Constants.USER_TYPE_GPLUS)){
+
+                        googlePlusLogout();
+
+                    }
+
                 }
             } catch (JSONException e) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
@@ -653,6 +678,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public void onStop() {
         super.onStop();
         accessTokenTracker.stopTracking();
+        //  profileTracker.stopTracking();
     }
 
     @Override
@@ -676,8 +702,48 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     private void dismissProgress() {
-        if (progressDialog != null && progressDialog.isShowing()) {
+        if (progressDialog != null && progressDialog.isShowing())
             progressDialog.cancel();
+    }
+    private void googlePlusLogout() {
+        if (mGoogleApiClient.isConnected()) {
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                    new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(Status status) {
+//                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+//                            finish();
+                        }
+                    });
+            //   Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+            revokeAccess();
+
+        } else {
+            mGoogleApiClient.connect();   // It can send user to onConnected(), call logout again from there
         }
+    }
+
+    protected void revokeAccess() {
+
+        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        mGoogleApiClient.disconnect();
+                        // mGoogleApiClient.connect();
+                        // Clear data and go to login activity
+                    }
+                });
+    }
+
+
+
+
+    public AppPreferenceManager getPrefManager() {
+        if (pref == null) {
+            pref = new AppPreferenceManager(this);
+        }
+
+        return pref;
     }
 }

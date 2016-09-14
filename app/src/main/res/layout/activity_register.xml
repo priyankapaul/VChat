@@ -40,7 +40,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:src="@drawable/user_img" />
+                    android:src="@drawable/user_circle" />
 
                 <LinearLayout
                     android:layout_width="42dp"
