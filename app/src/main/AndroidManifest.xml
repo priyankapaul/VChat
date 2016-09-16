@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.iwebnext.vchatt">
 
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
     <uses-permission android:name="android.permission.INTERNET" />
     <!--
      needed for older devices -
@@ -37,6 +38,9 @@
         <activity android:name="com.iwebnext.vchatt.activity.SignUpActivity" />
 
         <activity android:name="com.iwebnext.vchatt.activity.FriendRequestActivity" />
+        <activity android:name="com.iwebnext.vchatt.activity.FriendProfileActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            />
         <activity
             android:name="com.iwebnext.vchatt.activity.ForgetPasswordActivity"
             android:label="@string/app_name"
@@ -49,7 +53,7 @@
         <activity
             android:name="com.iwebnext.vchatt.activity.AttachPictureActivity"
             android:label="@string/app_name"
-          />
+            />
         <activity
             android:name="com.iwebnext.vchatt.activity.LoginActivity"
             android:label="@string/app_name"
@@ -118,6 +122,11 @@
             android:name="com.facebook.FacebookContentProvider"
             android:authorities="com.facebook.app.FacebookContentProvider1649735658677847"
             android:exported="true" />
+        <!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+             App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

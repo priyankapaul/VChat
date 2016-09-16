@@ -20,6 +20,7 @@ public class EndPoints {
     public static final String UPDATE_AVATAR = BASE_URL + "/update_avatar";
     public static final String UPLOAD_FILE = BASE_URL + "/upload_file";
     public static final String DELETE_CHAT_HISTORY = BASE_URL + "/delete_chat_history";
+    public static final String FRIEND_PROFILE= BASE_URL + "/friend_profile/_ID_";
 
 
     // TODO - To use standard /v1/ version of APIs

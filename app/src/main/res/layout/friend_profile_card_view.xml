@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:elevation="100dp"
+    card_view:cardBackgroundColor="@android:color/white"
+    card_view:cardCornerRadius="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:id="@+id/l4"
+            android:layout_height="90dp"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:orientation="vertical"
+                >
+                <ImageView
+                    android:id="@+id/ficon4"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/f_name"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:id="@+id/tv_friend_name"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:paddingBottom="5dp"
+                    android:textSize="20sp"
+                    android:paddingTop="5dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/ficon4"
+                    android:layout_toEndOf="@+id/ficon4" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/name"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:text="Name"
+                    android:paddingTop="5dp"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:layout_toRightOf="@+id/ficon4"
+                    android:layout_toEndOf="@+id/ficon4"
+                    android:layout_alignParentBottom="true" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@android:color/darker_gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/l1"
+        android:layout_height="90dp"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:orientation="vertical"
+            >
+            <ImageView
+                android:id="@+id/ficon1"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/f_phone"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:id="@+id/tv_friend_phn"
+                android:layout_height="wrap_content"
+                android:text="Phone No"
+                android:paddingBottom="5dp"
+                android:textSize="20sp"
+                android:paddingTop="5dp"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/ficon1"
+                android:layout_toEndOf="@+id/ficon1" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/mobile"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:text="Mobile"
+                android:paddingTop="5dp"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_toRightOf="@+id/ficon1"
+                android:layout_toEndOf="@+id/ficon1"
+                android:layout_alignParentBottom="true" />
+        </RelativeLayout>
+    </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@android:color/darker_gray" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:id="@+id/l2"
+            android:layout_height="90dp"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:orientation="vertical"
+                >
+                <ImageView
+                    android:id="@+id/ficon2"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/f_place"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:id="@+id/tv_friend_place"
+                    android:layout_height="wrap_content"
+                    android:text="Address"
+                    android:textSize="20sp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/ficon2"
+                    android:layout_toEndOf="@+id/ficon2" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/Place"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:text="Address"
+                    android:paddingTop="5dp"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:layout_toRightOf="@+id/ficon2"
+                    android:layout_toEndOf="@+id/ficon2"
+                    android:layout_alignParentBottom="true" />
+            </RelativeLayout>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@android:color/darker_gray" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:id="@+id/l3"
+            android:layout_height="90dp"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:orientation="vertical"
+                >
+                <ImageView
+                    android:id="@+id/ficon3"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/f_profession"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:id="@+id/tv_friend_profession"
+                    android:layout_height="wrap_content"
+                    android:text="Profession"
+                    android:textSize="20sp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/ficon3"
+                    android:layout_toEndOf="@+id/ficon3" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/profession"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:text="Profession"
+                    android:paddingTop="5dp"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:layout_toRightOf="@+id/ficon3"
+                    android:layout_toEndOf="@+id/ficon3"
+                    android:layout_alignParentBottom="true" />
+            </RelativeLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

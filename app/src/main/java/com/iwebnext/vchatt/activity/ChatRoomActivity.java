@@ -82,16 +82,31 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         final Intent intent = getIntent();
         mPeerId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
-        String title = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_NAME);
+
+        final String title = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_NAME);
+
 
         if (mPeerId == null) {
-            Toast.makeText(getApplicationContext(), "Chat room not found!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Message not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
+
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(title);
         setSupportActionBar(toolbar);
+
+        toolbar.findViewById(R.id.toolbar).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(ChatRoomActivity.this, FriendProfileActivity.class);
+                i.putExtra(Constants.EXTRA_KEY_FRIEND_NAME, title);
+                i.putExtra(Constants.EXTRA_KEY_FRIEND_ID, mPeerId);
+                startActivity(i);
+
+            }
+        });
 
         mInputMessage = (EditText) findViewById(R.id.message);
         mBtnSend = (Button) findViewById(R.id.btn_send);
@@ -180,14 +195,11 @@ public class ChatRoomActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                         FileUploadUtils.PERMISSIONS_REQUEST_READ_MEDIA);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
             }
         }
         Intent intent;
         switch (item.getItemId()) {
+
             case R.id.action_logout:
                 BaseApplication.getInstance().logout();
                 break;
@@ -261,13 +273,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 endPoint, new Response.Listener<String>() {
-            //            "error": false,
-//                    "message": {
-//                "content": "hey tweety",
-//                        "message_id": 888,
-//                        "created_at": "2016-08-19 05:21:40",
-//                        "type": 0
-//            }
+
             @Override
             public void onResponse(String response) {
                 Log.e(TAG, "response: " + response);
@@ -301,7 +307,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                 } catch (JSONException e) {
                     Log.e(TAG, "json parsing error: " + e.getMessage());
-                    Toast.makeText(getApplicationContext(), "json parse error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Network error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         }, new Response.ErrorListener() {
@@ -310,7 +316,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 NetworkResponse networkResponse = error.networkResponse;
                 Log.e(TAG, "Network error: " + error.getMessage() + ", code: " + networkResponse);
-                Toast.makeText(getApplicationContext(), "Volley error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Network error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 mInputMessage.setText(message);
             }
         }) {
@@ -368,7 +374,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 NetworkResponse networkResponse = error.networkResponse;
                 Log.e(TAG, "Network error: " + error.getMessage() + ", code: " + networkResponse);
-                Toast.makeText(getApplicationContext(), "Volley error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Network error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
         //Adding request to request queue
@@ -406,7 +412,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = ProgressDialog.show(ChatRoomActivity.this, "Uploading...", "Please wait...", false, false);
+            progressDialog = ProgressDialog.show(ChatRoomActivity.this, "Sending...", "Please wait...", false, false);
         }
 
         @Override
@@ -482,7 +488,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                     mRvChatThread.getLayoutManager().smoothScrollToPosition(mRvChatThread, null, mAdapter.getItemCount() - 1);
                 }
             } else {
-                Toast.makeText(getApplicationContext(), "" + obj.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), "" + obj.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();
             }
 
         } catch (JSONException e) {

@@ -5,15 +5,18 @@ import java.io.Serializable;
 
 public class Friend implements Serializable {
     String id, name, lastMessage, timestamp;
-    String image;
+    String image, telephone, profession, address;
     int unreadCount;
 
     public Friend() {
     }
 
-    public Friend(String id, String image, String name, String lastMessage, String timestamp, int unreadCount) {
+    public Friend(String id, String image, String name, String lastMessage, String profession, String address,String telephone, String timestamp, int unreadCount) {
         this.id = id;
         this.name = name;
+        this.telephone = telephone;
+        this.address = address;
+        this.profession = profession;
         this.image = image;
         this.lastMessage = lastMessage;
         this.timestamp = timestamp;
@@ -43,6 +46,24 @@ public class Friend implements Serializable {
         this.name = name;
     }
 
+    public String getTelephone(){
+        return telephone;
+    }
+    public void setTelephone(String telephone){
+        this.telephone = telephone;
+    }
+    public String getProfession(){
+        return profession;
+    }
+    public void setProfession(String profession){
+        this.profession = profession;
+    }
+    public String getAddress(){
+        return address;
+    }
+    public void setAddress(String address){
+        this.address = address;
+    }
 
     public String getLastMessage() {
         return lastMessage;
