@@ -556,7 +556,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         showHomeScreen();
                     } else {
                         // login error - simply toast the message
-                        Toast.makeText(getApplicationContext(), "" + obj.getJSONObject("error").getString("message"), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "" + obj.getString("message"), Toast.LENGTH_LONG).show();
                     }
 
                 } catch (JSONException e) {

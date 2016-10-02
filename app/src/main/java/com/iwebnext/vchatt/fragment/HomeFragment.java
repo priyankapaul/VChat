@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -31,8 +30,8 @@ import com.iwebnext.vchatt.activity.ChatRoomActivity;
 import com.iwebnext.vchatt.activity.MainActivity;
 import com.iwebnext.vchatt.activity.SearchUsersActivity;
 import com.iwebnext.vchatt.adapter.FriendListAdapter;
-import com.iwebnext.vchatt.app.Config;
 import com.iwebnext.vchatt.app.BaseApplication;
+import com.iwebnext.vchatt.app.Config;
 import com.iwebnext.vchatt.gcm.GcmIntentService;
 import com.iwebnext.vchatt.gcm.NotificationUtils;
 import com.iwebnext.vchatt.helper.SimpleDividerItemDecoration;
@@ -61,7 +60,6 @@ public class HomeFragment extends Fragment implements MainActivity.SearchQueryLi
 
     private FriendListAdapter friendListAdapter;
     private RecyclerView rvFriends;
-    FrameLayout Frame;
 
     public HomeFragment() {
     }
@@ -78,7 +76,6 @@ public class HomeFragment extends Fragment implements MainActivity.SearchQueryLi
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.content_main, container, false);
         rvFriends = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-        Frame = (FrameLayout) rootView.findViewById(R.id.fab_frame);
         final FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,7 +84,6 @@ public class HomeFragment extends Fragment implements MainActivity.SearchQueryLi
                 startActivity(intent);
             }
         });
-
 
         /**
          * Broadcast receiver calls in two scenarios
@@ -210,21 +206,35 @@ public class HomeFragment extends Fragment implements MainActivity.SearchQueryLi
      */
     private void handlePushNotification(Intent intent) {
         int type = intent.getIntExtra("type", -1);
+        Message message;
+        String friendId;
+        switch (type) {
+            case Config.PUSH_TYPE_CHATROOM:
+                message = (Message) intent.getSerializableExtra(Constants.EXTRA_KEY_MESSAGE);
+                friendId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
 
-        // if the push is of chat room message
-        // simply update the UI unread messages count
-        if (type == Config.PUSH_TYPE_CHATROOM) {
-            Message message = (Message) intent.getSerializableExtra("message");
-            String friendId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
-
-            if (message != null && friendId != null) {
-                updateRow(friendId, message);
-            }
-        } else if (type == Config.PUSH_TYPE_USER) {
-            // push belongs to user alone
-            // just showing the message in a toast
-            Message message = (Message) intent.getSerializableExtra("message");
-            Toast.makeText(getActivity(), "New push: " + message.getContent(), Toast.LENGTH_LONG).show();
+                if (message != null && friendId != null) {
+                    updateRow(friendId, message);
+                }
+                break;
+            case Config.PUSH_TYPE_USER:
+                // push belongs to user alone
+                // just showing the message in a toast
+                message = (Message) intent.getSerializableExtra(Constants.EXTRA_KEY_MESSAGE);
+                Toast.makeText(getActivity(), "New push: " + message.getContent(), Toast.LENGTH_LONG).show();
+                break;
+            case Config.PUSH_TYPE_USER_STATUS:
+                // update specific user in friend list
+                friendId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
+                boolean userStatus = intent.getBooleanExtra(Constants.EXTRA_KEY_USER_STATUS, false);
+                for (Friend friend : friendsArrayList) {
+                    if (friend.getId().equals(friendId)) {
+                        friend.setStatus(userStatus);
+                        friendListAdapter.notifyDataSetChanged();
+                        break;
+                    }
+                }
+                break;
         }
 
 
@@ -282,6 +292,7 @@ public class HomeFragment extends Fragment implements MainActivity.SearchQueryLi
                                 friend.setLastMessage("");
                                 friend.setUnreadCount(0);
                                 friend.setTimestamp(friendObj.getString("created_at"));
+                                friend.setStatus(friendObj.getString("user_status").equals("1"));
                                 friendsArrayList.add(friend);
                                 backupFriendsArrayList.add(friend);
                             }

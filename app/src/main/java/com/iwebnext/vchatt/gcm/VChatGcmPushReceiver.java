@@ -20,17 +20,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.gcm.GcmListenerService;
 import com.iwebnext.vchatt.activity.ChatRoomActivity;
-import com.iwebnext.vchatt.activity.MainActivity;
 import com.iwebnext.vchatt.app.Config;
 import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.Message;
-import com.iwebnext.vchatt.model.User;
 import com.iwebnext.vchatt.utils.Constants;
 
 import org.json.JSONException;
@@ -87,6 +83,9 @@ public class VChatGcmPushReceiver extends GcmListenerService {
                 // push notification is specific to user
 //                processUserMessage(title, isBackground, data);
                 break;
+            case Config.PUSH_TYPE_USER_STATUS:
+                processUserStatusPush(isBackground, data);
+                break;
         }
     }
 
@@ -101,6 +100,26 @@ public class VChatGcmPushReceiver extends GcmListenerService {
 //                "user_name":"priyanka"
 //    }
 
+    private void processUserStatusPush(boolean isBackground, String data) {
+        if(!isBackground) {
+            try {
+                JSONObject dataObj = new JSONObject(data);
+                JSONObject uObj = dataObj.getJSONObject("user");
+
+                String userId = uObj.getString("user_id");
+                boolean userStatus = uObj.getBoolean("user_status");
+
+                Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
+                pushNotification.putExtra(Constants.EXTRA_KEY_PUSH_TYPE, Config.PUSH_TYPE_USER_STATUS);
+                pushNotification.putExtra(Constants.EXTRA_KEY_USER_STATUS, userStatus);
+                pushNotification.putExtra(Constants.EXTRA_KEY_FRIEND_ID, userId);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
+            } catch (JSONException e) {
+                Log.e(TAG, "json parsing error: " + e.getMessage());
+            }
+        }
+    }
+
     /**
      * Processing chat room push message
      * this message will be broadcasts to all the activities registered
@@ -109,9 +128,9 @@ public class VChatGcmPushReceiver extends GcmListenerService {
         if (!isBackground) {
 
             try {
-                JSONObject datObj = new JSONObject(data);
+                JSONObject dataObj = new JSONObject(data);
 
-                JSONObject uObj = datObj.getJSONObject("user");
+                JSONObject uObj = dataObj.getJSONObject("user");
 
                 // skip the message if the message belongs to same user as
                 // the user would be having the same message when he was sending
@@ -125,7 +144,7 @@ public class VChatGcmPushReceiver extends GcmListenerService {
                 String userName = uObj.getString("user_name");
 
                 Message message = null;
-                JSONObject msgObj = datObj.getJSONObject("message");
+                JSONObject msgObj = dataObj.getJSONObject("message");
 
                 String msgId = msgObj.getString("message_id");
                 String content = msgObj.getString("content");
@@ -139,8 +158,8 @@ public class VChatGcmPushReceiver extends GcmListenerService {
 
                     // app is in foreground, broadcast the push message
                     Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
-                    pushNotification.putExtra("type", Config.PUSH_TYPE_CHATROOM);
-                    pushNotification.putExtra("message", message);
+                    pushNotification.putExtra(Constants.EXTRA_KEY_PUSH_TYPE, Config.PUSH_TYPE_CHATROOM);
+                    pushNotification.putExtra(Constants.EXTRA_KEY_MESSAGE, message);
                     pushNotification.putExtra(Constants.EXTRA_KEY_FRIEND_ID, userId);
                     LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
 
@@ -157,7 +176,7 @@ public class VChatGcmPushReceiver extends GcmListenerService {
 
             } catch (JSONException e) {
                 Log.e(TAG, "json parsing error: " + e.getMessage());
-                Toast.makeText(getApplicationContext(), "Json parse error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(), "Json parse error: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
 
         } else {

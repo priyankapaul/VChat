@@ -7,11 +7,12 @@ public class Friend implements Serializable {
     String id, name, lastMessage, timestamp;
     String image, telephone, profession, address;
     int unreadCount;
+    boolean status;
 
     public Friend() {
     }
 
-    public Friend(String id, String image, String name, String lastMessage, String profession, String address,String telephone, String timestamp, int unreadCount) {
+    public Friend(String id, String image, String name, String lastMessage, String profession, String address,String telephone, String timestamp, int unreadCount, boolean status) {
         this.id = id;
         this.name = name;
         this.telephone = telephone;
@@ -21,6 +22,7 @@ public class Friend implements Serializable {
         this.lastMessage = lastMessage;
         this.timestamp = timestamp;
         this.unreadCount = unreadCount;
+        this.status = status;
     }
 
     public String getId() {
@@ -87,5 +89,13 @@ public class Friend implements Serializable {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 }

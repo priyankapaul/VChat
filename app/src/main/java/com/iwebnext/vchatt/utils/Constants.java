@@ -7,6 +7,9 @@ public class Constants {
     public static final String EXTRA_KEY_USER_EMAIL = "extra_user_email";
     public static final String EXTRA_KEY_FRIEND_ID = "extra_friend_id";
     public static final String EXTRA_KEY_FRIEND_NAME = "extra_name";
+    public static final String EXTRA_KEY_PUSH_TYPE = "extra_type";
+    public static final String EXTRA_KEY_MESSAGE = "extra_message";
+    public static final String EXTRA_KEY_USER_STATUS = "extra_user_status";
 
     // TAG CONSTANTS TO BE USED WHILE PARSING JSON DATA
     public static final String TAG_IMAGE_URL = "image";

@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.activity.CircularNetworkImageView;
@@ -29,6 +30,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView name, message, timestamp, count;
         public CircularNetworkImageView image;
+        public ToggleButton status;
 
         public ViewHolder(View view) {
             super(view);
@@ -37,11 +39,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
             message = (TextView) view.findViewById(R.id.message);
             timestamp = (TextView) view.findViewById(R.id.timestamp);
             count = (TextView) view.findViewById(R.id.count);
+            status = (ToggleButton) view.findViewById(R.id.status);
         }
     }
 
 
-    public FriendListAdapter(Context mContext, ArrayList<Friend> friendArrayList) {
+    public FriendListAdapter(Context context, ArrayList<Friend> friendArrayList) {
         this.friendArrayList = friendArrayList;
 
         Calendar calendar = Calendar.getInstance();
@@ -62,9 +65,9 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Vi
         Friend friend = friendArrayList.get(position);
         holder.name.setText(friend.getName());
         holder.image.setImageUrl(friend.getImage(), BaseApplication.getInstance().getImageLoader());
-      //  holder.image.setImageBitmap(friend.getImage());
+        //  holder.image.setImageBitmap(friend.getImage());
 
-
+        holder.status.setChecked(friend.isStatus());
         holder.message.setText(friend.getLastMessage());
         if (friend.getUnreadCount() > 0) {
             holder.count.setText(String.valueOf(friend.getUnreadCount()));

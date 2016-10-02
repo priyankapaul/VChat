@@ -8,12 +8,10 @@
     android:paddingTop="16dp">
 
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/thumbnail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:layout_alignParentLeft="true"
         android:layout_marginRight="5dip"
         android:padding="3dip">
 
@@ -25,7 +23,18 @@
             android:paddingTop="10dp"
             android:src="@drawable/user_circle" />
 
-    </LinearLayout>
+        <ToggleButton
+            android:id="@+id/status"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_gravity="right|center_vertical"
+            android:background="@drawable/ic_toggle_status"
+            android:enabled="false"
+            android:textOff=""
+            android:textOn=""
+            android:visibility="invisible" />
+
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/name_msg_title"

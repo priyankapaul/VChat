@@ -160,7 +160,7 @@ public class FriendProfileActivity extends AppCompatActivity {
                                 friend.setTelephone(friendObj.getString("telephone"));
                                 friend.setAddress(friendObj.getString("address"));
                                 friend.setProfession(friendObj.getString("profession"));
-
+                                friend.setStatus(friendObj.getString("user_status").equals("1"));
                                 friendProfileList.add(friend);
                     }
                     else {
