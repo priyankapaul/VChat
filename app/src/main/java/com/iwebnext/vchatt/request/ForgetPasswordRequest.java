@@ -13,7 +13,7 @@ public class ForgetPasswordRequest extends StringRequest {
     public ForgetPasswordRequest(String forgetEmail, Response.Listener<String> listener) {
         super(Method.POST, REGISTER_REQUEST_URL, listener, null);
         params = new HashMap<>();
-     params.put("email", forgetEmail);
+        params.put("email", forgetEmail);
     }
 
     @Override

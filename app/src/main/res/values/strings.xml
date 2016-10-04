@@ -39,5 +39,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="action_attach_image">Attach Image</string>
     <string name="action_attach_video">Attach Video</string>
+    <string name="forgot_password_msg" formatted="false">Password information has been emailed to %s. Please check email for further information.</string>
+    <string name="forgot_password_msg_no_user" formatted="false">The email address %s is not registered with VChat app. Please try again later.</string>
 
 </resources>

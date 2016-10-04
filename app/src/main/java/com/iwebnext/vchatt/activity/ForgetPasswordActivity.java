@@ -32,6 +32,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
     private Button btnReset, btnLogin;
     private TextView resetText;
     private DotProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,14 +73,18 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                             boolean success = jsonResponse.getBoolean("success");
                             if (success) {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(ForgetPasswordActivity.this);
-                                builder.setMessage("Sending Email")
+                                String msg = String.format(ForgetPasswordActivity.this.getString(R.string.forgot_password_msg), forgetEmail);
+                                builder.setTitle("Forgot Password")
+                                        .setMessage(msg)
                                         .setNegativeButton("ok", null)
                                         .create()
                                         .show();
 
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(ForgetPasswordActivity.this);
-                                builder.setMessage("Sending Email Failed")
+                                String msg = String.format(ForgetPasswordActivity.this.getString(R.string.forgot_password_msg_no_user), forgetEmail);
+                                builder.setTitle("Error")
+                                        .setMessage(msg)
                                         .setNegativeButton("Retry", null)
                                         .create()
                                         .show();
@@ -94,7 +99,6 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                 BaseApplication.getInstance().addToRequestQueue(forgetPasswordRequest);
             }
         });
-
 
 
     }
