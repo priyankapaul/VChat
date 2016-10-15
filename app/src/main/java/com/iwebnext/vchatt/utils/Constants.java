@@ -19,4 +19,5 @@ public class Constants {
     public static final String USER_TYPE_NORMAL = "0";
     public static final String USER_TYPE_FACEBOOK = "1";
     public static final String USER_TYPE_GPLUS = "2";
+    public static final String EXTRA_KEY_FRIEND_IMAGE = "extra_image";
 }

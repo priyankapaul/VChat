@@ -11,6 +11,8 @@ public class User implements Serializable {
     public static int FRIEND_REQUEST_SENT = 1;
     public static int FRIEND_REQUEST_ACCEPTED = 2;
     public static int FRIEND_REQUEST_CANCELLED = 3;
+    public static int FRIEND_REMOVE = 4;
+    public static int FRIEND_REQUEST_DECLINE = 5;
     public static int PICTURE_SENT = 1;
 
 

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="20dp"
+    android:paddingLeft="15dp"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/group_image"
+        android:src="@drawable/user_circle"
+        android:layout_above="@+id/group_name"
+        android:layout_centerHorizontal="true" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:gravity="center_horizontal"
+        android:hint="Group Name"
+        android:paddingLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:id="@+id/group_name"
+        android:layout_above="@+id/instruction"
+        android:layout_alignRight="@+id/group_image"
+        android:layout_alignEnd="@+id/group_image" />
+
+
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/linearLayout">
+
+</LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Provide a group name and image here"
+        android:paddingLeft="10dp"
+        android:paddingTop="20dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/instruction" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:id="@+id/tick"
+        android:src="@drawable/tick"
+        app:layout_anchorGravity="bottom|right|end"
+        app:pressedTranslationZ="16dp"
+        app:rippleColor="#F06292"
+        android:paddingBottom="40dp"
+        android:layout_marginBottom="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/group_name"
+        android:layout_alignEnd="@+id/group_name" />
+
+</RelativeLayout>
+

@@ -2,11 +2,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/friend_request_back"
+    android:background="@drawable/black_back_pro"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin">
+    android:paddingTop="35dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,12 +15,15 @@
         android:paddingLeft="20dp"
         android:paddingRight="10dp"
         android:paddingTop="70dp"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_img"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:layout_below="@+id/tv_title"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
@@ -35,7 +38,8 @@
             android:layout_gravity="center"
             android:padding="10dp"
             android:text="Name"
-            android:textColor="#000033"
+            android:layout_marginTop="10dp"
+            android:textColor="#ffff"
             android:textSize="25sp"
             android:textStyle="bold" />
 
@@ -50,10 +54,11 @@
             android:visibility="gone" />
 
         <Button
-            android:id="@+id/btn_add"
+            android:id="@+id/btn_send"
             android:layout_width="188dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:visibility="gone"
             android:background="@drawable/button_shadow"
             android:text="Send Friend Request"
             android:textColor="#ffff" />
@@ -67,6 +72,44 @@
             android:textColor="#ffff"
             android:visibility="gone"
             android:layout_gravity="center" />
+
+        <Button
+            android:id="@+id/btn_remove"
+            android:layout_width="188dp"
+            android:layout_height="wrap_content"
+            android:text="Remove Friend"
+            android:background="@drawable/request_cancel"
+            android:textColor="#ffff"
+            android:visibility="gone"
+            android:layout_gravity="center" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <Button
+                android:id="@+id/btn_accept"
+                android:layout_width="124dp"
+                android:layout_height="wrap_content"
+                android:text="Accept"
+                android:background="@drawable/request_accept"
+                android:textColor="#ffff"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                android:layout_weight="0.46" />
+            <Button
+                android:layout_width="124dp"
+                android:layout_height="wrap_content"
+                android:text="Decline"
+                android:id="@+id/btn_decline"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/request_cancel"
+                android:textColor="#ffff"
+                android:layout_weight="0.49" />
+        </LinearLayout>
 
 
     </LinearLayout>

@@ -64,7 +64,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private static final int RC_SELECT_VIDEO = 2;
 
     private String mUserId;
-    private String mUserName;
+    private String mUserName,mPeerImage;
     private String mPeerId;
     private RecyclerView mRvChatThread;
     private ChatRoomThreadAdapter mAdapter;
@@ -76,7 +76,8 @@ public class ChatRoomActivity extends AppCompatActivity {
     String mUploadFile;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+        {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
@@ -84,14 +85,12 @@ public class ChatRoomActivity extends AppCompatActivity {
         mPeerId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
 
         final String title = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_NAME);
-
+        final String mPeerImage = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_IMAGE);
 
         if (mPeerId == null) {
             Toast.makeText(getApplicationContext(), "Message not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
-
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(title);
@@ -101,8 +100,9 @@ public class ChatRoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(ChatRoomActivity.this, FriendProfileActivity.class);
-                i.putExtra(Constants.EXTRA_KEY_FRIEND_NAME, title);
+                i.putExtra(Constants.EXTRA_KEY_FRIEND_NAME,title);
                 i.putExtra(Constants.EXTRA_KEY_FRIEND_ID, mPeerId);
+                i.putExtra(Constants.EXTRA_KEY_FRIEND_IMAGE,mPeerImage);
                 startActivity(i);
 
             }
@@ -119,6 +119,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         User user = BaseApplication.getInstance().getPrefManager().getUser();
         mUserId = user.getId();
         mUserName = user.getName();
+
 
         mAdapter = new ChatRoomThreadAdapter(this, mMessageArrayList, mUserId);
 
@@ -203,6 +204,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             case R.id.action_logout:
                 BaseApplication.getInstance().logout();
                 break;
+
             case R.id.action_attach_image:
                 chooseImage();
                 return true;

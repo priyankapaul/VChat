@@ -356,7 +356,6 @@ public class ProfileFragment extends Fragment {
 
                 } catch (JSONException e) {
                     Log.e(TAG, "json parsing error: " + e.getMessage());
-                    Toast.makeText(getActivity(), "Json parse error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
 
                 //  mAdapter.notifyDataSetChanged();
@@ -368,7 +367,7 @@ public class ProfileFragment extends Fragment {
             public void onErrorResponse(VolleyError error) {
                 NetworkResponse networkResponse = error.networkResponse;
                 Log.e(TAG, "Volley error: " + error.getMessage() + ", code: " + networkResponse);
-                 Toast.makeText(getActivity(), "Volley error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                 Toast.makeText(getActivity(), "Network error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 

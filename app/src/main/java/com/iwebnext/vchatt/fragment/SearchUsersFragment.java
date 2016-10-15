@@ -181,7 +181,6 @@ public class SearchUsersFragment extends Fragment {
 
                 } catch (JSONException e) {
                     Log.e(TAG, "json parsing error: " + e.getMessage());
-                    Toast.makeText(getActivity(), "Json parse error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
 
                 mAdapter.notifyDataSetChanged();

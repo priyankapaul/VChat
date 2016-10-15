@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,17 +17,24 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.toolbox.Volley;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.activity.ImageConverter;
 import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.model.User;
+import com.iwebnext.vchatt.request.AcceptFriendRequest;
+import com.iwebnext.vchatt.request.DeclineFriendRequest;
 import com.iwebnext.vchatt.request.FriendRequestCancelled;
 import com.iwebnext.vchatt.request.FriendRequestSent;
+import com.iwebnext.vchatt.request.RemoveFriend;
 import com.iwebnext.vchatt.utils.Constants;
+import com.iwebnext.vchatt.utils.EndPoints;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,11 +50,11 @@ import java.net.URL;
 public class FriendRequestSentFragment extends Fragment {
     private TextView tvName, tvId;
     private ImageView ivImage;
-    private Button btnAdd, btnCancel;
+    private Button btnSend, btnCancel, btnRemove, btnAccept, btnDecline;
     private String TAG = FriendRequestSentFragment.class.getSimpleName();
 
     private User userToSendFriendRequest;
-
+    //    String  mPeerId = userToSendFriendRequest.getId();
     public FriendRequestSentFragment() {
     }
 
@@ -56,12 +64,21 @@ public class FriendRequestSentFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.add_friend, container, false);
 
         userToSendFriendRequest = (User) getArguments().getSerializable(Constants.EXTRA_KEY_USER);
+        String  mPeerId =   userToSendFriendRequest.getId();
 
-
+        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
         tvName = (TextView) rootView.findViewById(R.id.tv_name);
 
-        btnAdd = (Button) rootView.findViewById(R.id.btn_add);
-        btnAdd.setEnabled(true);
+        btnSend = (Button) rootView.findViewById(R.id.btn_send);
+
+        btnRemove = (Button) rootView.findViewById(R.id.btn_remove);
+
+        btnAccept = (Button) rootView.findViewById(R.id.btn_accept);
+
+        btnCancel = (Button) rootView.findViewById(R.id.btn_request_cancel);
+
+        btnDecline = (Button) rootView.findViewById(R.id.btn_decline);
+
         tvId = (TextView) rootView.findViewById(R.id.tv_id);
 
         Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.user_profile);
@@ -70,30 +87,23 @@ public class FriendRequestSentFragment extends Fragment {
         ivImage = (ImageView) rootView.findViewById(R.id.iv_img);
         ivImage.setImageBitmap(circularBitmap);
 
-
-        btnCancel = (Button) rootView.findViewById(R.id.btn_request_cancel);
+        showUserProfile();
 
         // set visibility depending upon friend request status
-        int status = userToSendFriendRequest.getFriendRequestStatus();
-        if (status == User.FRIEND_REQUEST_NOT_INITIATED || status == User.FRIEND_REQUEST_CANCELLED) {
-            btnCancel.setVisibility(View.GONE);
-            btnAdd.setVisibility(View.VISIBLE);
-        } else {
-            btnCancel.setVisibility(View.VISIBLE);
-            btnAdd.setVisibility(View.GONE);
-        }
+//        int status = userToSendFriendRequest.getFriendRequestStatus();
+//        if (status == User.FRIEND_REQUEST_NOT_INITIATED || status == User.FRIEND_REQUEST_CANCELLED) {
+//            btnCancel.setVisibility(View.GONE);
+//            btnSend.setVisibility(View.VISIBLE);
+//        } else {
+//            btnCancel.setVisibility(View.VISIBLE);
+//            btnSend.setVisibility(View.GONE);
+//        }
 
-        btnAdd.setOnClickListener(new View.OnClickListener() {
+        btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                btnCancel.setVisibility(View.VISIBLE);
-                btnAdd.setVisibility(View.GONE);
-
                 final String id = new String(userToSendFriendRequest.getId());
 
-                //final String id = tvId.getId().toString();
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -104,7 +114,7 @@ public class FriendRequestSentFragment extends Fragment {
 
                             if (success) {
                                 userToSendFriendRequest.setFriendRequestStatus(User.FRIEND_REQUEST_SENT);
-                                btnAdd.setEnabled(true);
+                                btnSend.setEnabled(true);
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                                 builder.setMessage("Friend request send successfully")
                                         .setNegativeButton("ok", null)
@@ -112,7 +122,7 @@ public class FriendRequestSentFragment extends Fragment {
                                         .show();
 
                             } else {
-                                btnAdd.setEnabled(false);
+                                btnSend.setEnabled(false);
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                                 builder.setMessage("Already sent")
                                         // .setNegativeButton("Retry", null)
@@ -130,16 +140,12 @@ public class FriendRequestSentFragment extends Fragment {
 
             }
         });
-        showUserProfile();
+
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btnCancel.setVisibility(View.VISIBLE);
-                btnAdd.setVisibility(View.GONE);
 
                 final String id = new String(userToSendFriendRequest.getId());
-
-                //final String id = tvId.getId().toString();
 
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
                     @Override
@@ -154,8 +160,6 @@ public class FriendRequestSentFragment extends Fragment {
                                         .setNegativeButton("ok", null)
                                         .create()
                                         .show();
-                                // Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                                //SignUpActivity.this.startActivity(intent);
                             } else {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                                 builder.setMessage("Failed")
@@ -174,18 +178,185 @@ public class FriendRequestSentFragment extends Fragment {
 
             }
         });
+        btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final String id = new String(userToSendFriendRequest.getId());
+                Response.Listener<String> responseListener = new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response);
+                            boolean success = jsonResponse.getBoolean("success");
+                            if (success) {
+                                userToSendFriendRequest.setFriendRequestStatus(User.FRIEND_REMOVE);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setMessage("remove friend successfully")
+                                        .setNegativeButton("ok", null)
+                                        .create()
+                                        .show();
+                            } else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setMessage("Failed")
+                                        .setNegativeButton("Retry", null)
+                                        .create()
+                                        .show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                RemoveFriend remove = new RemoveFriend(id, responseListener);
+                BaseApplication.getInstance().addToRequestQueue(remove);
+
+            }
+        });
+        btnAccept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final String id = new String(userToSendFriendRequest.getId());
+                Response.Listener<String> responseListener = new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response);
+                            boolean success = jsonResponse.getBoolean("success");
+                            if (success) {
+                                userToSendFriendRequest.setFriendRequestStatus(User.FRIEND_REQUEST_ACCEPTED);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setMessage("Friend added successfully")
+                                        .setNegativeButton("ok", null)
+                                        .create()
+                                        .show();
+                            } else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setMessage("Failed")
+                                        .setNegativeButton("Retry", null)
+                                        .create()
+                                        .show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                AcceptFriendRequest accept = new AcceptFriendRequest(id, responseListener);
+                BaseApplication.getInstance().addToRequestQueue(accept);
+
+            }
+        });
+        btnDecline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final String id = new String(userToSendFriendRequest.getId());
+                Response.Listener<String> responseListener = new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response);
+                            boolean success = jsonResponse.getBoolean("success");
+                            if (success) {
+                                userToSendFriendRequest.setFriendRequestStatus(User.FRIEND_REQUEST_DECLINE);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setMessage("Friend Request decline")
+                                        .setNegativeButton("ok", null)
+                                        .create()
+                                        .show();
+                            } else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setMessage("Failed")
+                                        .setNegativeButton("Retry", null)
+                                        .create()
+                                        .show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                DeclineFriendRequest decline = new DeclineFriendRequest(id, responseListener);
+                BaseApplication.getInstance().addToRequestQueue(decline);
+
+            }
+        });
         return rootView;
     }
 
+
     private void showUserProfile() {
         tvId.setText(userToSendFriendRequest.getId());
-
-        Log.i(TAG, "Friend id is" + userToSendFriendRequest.getId());
+        //   Log.i(TAG, "Friend id is" + userToSendFriendRequest.getId());
         tvName.setText(userToSendFriendRequest.getName());
-        Log.i(TAG, "Friend name is" + userToSendFriendRequest.getName());
+        //   Log.i(TAG, "Friend name is" + userToSendFriendRequest.getName());
         new DownloadImage().execute(userToSendFriendRequest.getImage());
+        allRequest();
     }
 
+    private void allRequest() {
+        String  mPeerId = userToSendFriendRequest.getId();
+        final String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
+        String endPoint = EndPoints.ALL_REQUEST.replace("_ID_", mPeerId);
+        endPoint = endPoint.replace("_MY_", selfUserId);
+
+        StringRequest strReq = new StringRequest(Request.Method.GET,
+                endPoint, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                Log.e(TAG, "response: " + response);
+
+                try {
+                    JSONObject jsonResponse = new JSONObject(response);
+                    boolean sent_friend_request = jsonResponse.getBoolean("sent_friend_request");
+                    boolean cancel_request = jsonResponse.getBoolean("cancel_request");
+                    boolean remove_friend = jsonResponse.getBoolean("remove_friend");
+                    boolean accept_friend = jsonResponse.getBoolean("accept_friend");
+                    boolean decline_friend_request = jsonResponse.getBoolean("decline_friend_request");
+
+
+                    if(sent_friend_request){
+                        btnSend.setVisibility(View.VISIBLE);
+                    }
+                    if(cancel_request){
+                        btnCancel.setVisibility(View.VISIBLE);
+                    }
+                    if(remove_friend){
+                        btnRemove.setVisibility(View.VISIBLE);
+                    }
+                    if(accept_friend){
+                        btnAccept.setVisibility(View.VISIBLE);
+                        btnDecline.setVisibility(View.VISIBLE);
+                    }
+                    if(decline_friend_request){
+                        btnAccept.setVisibility(View.VISIBLE);
+                        btnDecline.setVisibility(View.VISIBLE);
+                    }
+
+
+                } catch (JSONException e) {
+                    Log.e(TAG, "json parsing error: " + e.getMessage());
+                    Toast.makeText(getActivity(), "Network error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                NetworkResponse networkResponse = error.networkResponse;
+                Log.e(TAG, "Volley error: " + error.getMessage() + ", code: " + networkResponse);
+            }
+        });
+
+        BaseApplication.getInstance().addToRequestQueue(strReq);
+    }
 
     public class DownloadImage extends AsyncTask<String, Integer, Drawable> {
 

@@ -36,6 +36,7 @@ import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.fragment.HomeFragment;
 import com.iwebnext.vchatt.fragment.ProfileFragment;
+import com.iwebnext.vchatt.utils.Constants;
 import com.iwebnext.vchatt.utils.EndPoints;
 
 import org.json.JSONArray;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = MainActivity.class.getSimpleName();
     DrawerLayout drawer;
     private TextView navName;
+    private String mPeerId;
     private ImageView navImage;
     FragmentManager fragmentManager;
     SearchQueryListener fragmentListener;
@@ -60,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        final Intent intent = getIntent();
+        mPeerId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
+
 
         HomeFragment homeFragment = new HomeFragment();
         fragmentManager = getSupportFragmentManager();
@@ -83,17 +89,14 @@ public class MainActivity extends AppCompatActivity {
         Bitmap circularBitmap = ImageConverter.getRoundedCornerBitmap(bitmap, 100);
         navImage = (ImageView) hView.findViewById(R.id.nav_image);
         navImage.setImageBitmap(circularBitmap);
-
 //        ImageView navImage = (ImageView)hView.findViewById(R.id.nav_image);
 //        navImage.setImageBitmap(circularBitmap);
 
         navName = (TextView) hView.findViewById(R.id.nav_name);
 
-
         if (BaseApplication.getInstance().getPrefManager().getUser() == null) {
             launchLoginActivity();
         }
-
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
     }
@@ -150,8 +153,11 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean onOptionsItemSelected(MenuItem menuItem) {
 
-
         switch (menuItem.getItemId()) {
+            case R.id.action_group:
+                Intent intent = new Intent(MainActivity.this,GroupActivity.class);
+                startActivity(intent);
+                break;
             case R.id.action_logout:
                 BaseApplication.getInstance().logout();
                 break;

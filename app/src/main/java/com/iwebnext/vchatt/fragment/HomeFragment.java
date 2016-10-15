@@ -305,7 +305,7 @@ public class HomeFragment extends Fragment implements MainActivity.SearchQueryLi
 
                 } catch (JSONException e) {
                     Log.e(TAG, "json parsing error: " + e.getMessage());
-                    Toast.makeText(getActivity(), "Json parse error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Network error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
 
                 friendListAdapter.notifyDataSetChanged();

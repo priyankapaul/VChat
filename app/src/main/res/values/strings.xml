@@ -8,6 +8,7 @@
     <string name="err_msg_email">Enter valid email address</string>
     <string name="title_activity_chat_room_discussion">ChatRoomDiscussionActivity</string>
     <string name="action_logout">Logout</string>
+    <string name="action_group">Create Group</string>
     <string name="action_setting">Setting</string>
     <string name="icon_bar">&#xf039;</string>
     <string name="facebook_app_id">1649735658677847</string>

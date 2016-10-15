@@ -1,9 +1,11 @@
 package com.iwebnext.vchatt.activity;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
@@ -13,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -20,6 +23,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -39,31 +43,42 @@ import java.util.ArrayList;
 public class FriendProfileActivity extends AppCompatActivity {
     private String TAG = FriendProfileActivity.class.getSimpleName();
     private CollapsingToolbarLayout collapsingToolbarLayout = null;
-    private String peerId,peerName;
+    private String peerId,peerName,peerImage;
     private RecyclerView recyclerView;
     private FriendProfileAdapter friendProfileAdapter;
     private ArrayList<Friend> friendProfileList;
     private GoogleApiClient client;
     Toolbar toolbar;
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friend_profile_activity);
 
-
         final Intent intent = getIntent();
-       peerName = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_NAME);
+        peerName = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_NAME);
 
+        peerImage = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_IMAGE);
+        System.out.println("peer image" + peerImage);
         final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbarLayout.setTitle(peerName);
+        NetworkImageView imgColapse = (NetworkImageView) findViewById(R.id.img_collapse);
+        imgColapse.setImageUrl(peerImage, BaseApplication.getInstance().getImageLoader());
 
+        collapsingToolbarLayout.setTitle(peerName);
+        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
+
+        //  collapsingToolbarLayout.setBackground(Drawable.createFromPath(peerImage));
         Context context = this;
-        collapsingToolbarLayout.setContentScrimColor(ContextCompat.getColor(context, R.color.amber_400));
+        collapsingToolbarLayout.setContentScrimColor(ContextCompat.getColor(context, R.color.indigo_600));
+        collapsingToolbarLayout.setStatusBarScrimColor(getResources().getColor(R.color.indigo_900));
+
 
         dynamicToolbarColor();
         toolbarTextAppernce();
@@ -85,6 +100,18 @@ public class FriendProfileActivity extends AppCompatActivity {
         friendProfileAdapter = new FriendProfileAdapter(friendProfileList);
         recyclerView.setAdapter(friendProfileAdapter);
         fetchFriendProfile();
+
+
+        imgColapse.setOnClickListener(new View.OnClickListener() {
+            //Start new list activity
+            public void onClick(View v) {
+                Intent mainIntent = new Intent(FriendProfileActivity.this, FriendImageDownload.class);
+                mainIntent.putExtra(Constants.EXTRA_KEY_FRIEND_IMAGE, peerImage);
+                startActivity(mainIntent);
+            }
+        });
+
+
 
 
     }
@@ -136,7 +163,6 @@ public class FriendProfileActivity extends AppCompatActivity {
     private void fetchFriendProfile() {
 
         String endPoint = EndPoints.FRIEND_PROFILE.replace("_ID_", peerId);
-        System.out.println("Id izzz" + peerId);
 
         StringRequest strReq = new StringRequest(Request.Method.GET,
                 endPoint, new Response.Listener<String>() {
@@ -152,16 +178,16 @@ public class FriendProfileActivity extends AppCompatActivity {
                     if (obj.getBoolean("error") == false) {
                         JSONArray friendObjArr = obj.getJSONArray("friend_profile");
 
-                            JSONObject friendObj = (JSONObject) friendObjArr.get(0);
-                                Friend friend = new Friend();
-                                friend.setId(friendObj.getString("user_id"));
-                                friend.setName(friendObj.getString("name"));
+                        JSONObject friendObj = (JSONObject) friendObjArr.get(0);
+                        Friend friend = new Friend();
+                        friend.setId(friendObj.getString("user_id"));
+                        friend.setName(friendObj.getString("name"));
 
-                                friend.setTelephone(friendObj.getString("telephone"));
-                                friend.setAddress(friendObj.getString("address"));
-                                friend.setProfession(friendObj.getString("profession"));
-                                friend.setStatus(friendObj.getString("user_status").equals("1"));
-                                friendProfileList.add(friend);
+                        friend.setTelephone(friendObj.getString("telephone"));
+                        friend.setAddress(friendObj.getString("address"));
+                        friend.setProfession(friendObj.getString("profession"));
+
+                        friendProfileList.add(friend);
                     }
                     else {
                         // error in fetching friend list
@@ -173,7 +199,7 @@ public class FriendProfileActivity extends AppCompatActivity {
                     Toast.makeText(FriendProfileActivity.this, "Network error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
 
-              friendProfileAdapter.notifyDataSetChanged();
+                friendProfileAdapter.notifyDataSetChanged();
             }
         }, new Response.ErrorListener() {
             @Override

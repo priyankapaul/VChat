@@ -34,6 +34,21 @@
         app:rippleColor="#F06292"
         android:paddingBottom="40dp"/>
 
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/group_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/rigth_arrow"
+            android:visibility="gone"
+            app:elevation="13dp"
+            app:fabSize="normal"
+            app:pressedTranslationZ="16dp"
+            app:rippleColor="#F06292"
+            android:paddingBottom="40dp"/>
+
     </FrameLayout>
 
 </RelativeLayout>
