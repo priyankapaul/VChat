@@ -37,6 +37,7 @@ public class GroupActivity extends AppCompatActivity {
     public ArrayList<Friend> friendsArrayList;
     private GroupAdapter friendListAdapter;
     private RecyclerView rvFriends;
+    private GroupAdapter gAdapter;
     FrameLayout Frame;
 
     @Override
@@ -53,6 +54,15 @@ public class GroupActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(GroupActivity.this, GroupNameActivity.class);
+                ArrayList<String> myList = new ArrayList<String>();
+                intent.putExtra("mylist", myList);
+
+                GroupActivity fragment = new GroupActivity();
+
+//                Bundle bundle = new Bundle();
+//                bundle.putSerializable(Constants.EXTRA_KEY_USER, gAdapter.getItem(position));
+//                // bundle.putSerializable(Constants.EXTRA_KEY_USER, mAdapter.getItemId(position));
+
                 startActivity(intent);
             }
         });

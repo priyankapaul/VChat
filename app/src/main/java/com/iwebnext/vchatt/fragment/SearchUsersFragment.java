@@ -86,6 +86,7 @@ public class SearchUsersFragment extends Fragment {
         recyclerView.addOnItemTouchListener(new SearchAllUserAdapter.RecyclerTouchListener(getActivity(), recyclerView, new SearchAllUserAdapter.ClickListener() {
             @Override
             public void onClick(View view, int position) {
+
                 FriendRequestSentFragment fragment = new FriendRequestSentFragment();
 
                 // send data from Activity to Fragment

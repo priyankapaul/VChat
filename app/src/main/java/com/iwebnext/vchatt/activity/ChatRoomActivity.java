@@ -76,8 +76,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     String mUploadFile;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-        {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
@@ -91,6 +90,8 @@ public class ChatRoomActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Message not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
+
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(title);

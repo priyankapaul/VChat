@@ -10,6 +10,7 @@ public class Constants {
     public static final String EXTRA_KEY_PUSH_TYPE = "extra_type";
     public static final String EXTRA_KEY_MESSAGE = "extra_message";
     public static final String EXTRA_KEY_USER_STATUS = "extra_user_status";
+    public static final String EXTRA_KEY_FRIEND_IMAGE = "extra_image";
 
     // TAG CONSTANTS TO BE USED WHILE PARSING JSON DATA
     public static final String TAG_IMAGE_URL = "image";
@@ -19,5 +20,5 @@ public class Constants {
     public static final String USER_TYPE_NORMAL = "0";
     public static final String USER_TYPE_FACEBOOK = "1";
     public static final String USER_TYPE_GPLUS = "2";
-    public static final String EXTRA_KEY_FRIEND_IMAGE = "extra_image";
+
 }
