@@ -111,6 +111,8 @@ public class ProfileFragment extends Fragment {
         imageView.setImageBitmap(circularBitmap);
 
 
+
+
         fabProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,7 +147,6 @@ public class ProfileFragment extends Fragment {
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
-
             } else {
 
                 // No explanation needed, we can request the permission.
@@ -174,8 +175,6 @@ public class ProfileFragment extends Fragment {
                 } else {
                     //show progress in the meantime
                     showProgress();
-                    // SEND YOUR SIGNUP REQUEST WITH NEW DATA
-
 
                     final String name = etName.getText().toString();
                     final String email = etEmail.getText().toString();
@@ -435,6 +434,9 @@ public class ProfileFragment extends Fragment {
     protected void setImage(Drawable drawable) {
         imageView.setImageDrawable(drawable);
     }
+
+
+
 
     private void invokeImageUploadTask() {
         String userId = BaseApplication.getInstance().getPrefManager().getUser().getId();

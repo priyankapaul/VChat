@@ -166,6 +166,7 @@ public class SignUpActivity extends AppCompatActivity {
                     SignUpRequest request = new SignUpRequest(name, email, password, medicalLicenseNo, profession, state, "", "", "", Constants.USER_TYPE_NORMAL, "0", responseListener);
                     BaseApplication.getInstance().addToRequestQueue(request);
                     showProgress();
+
                 }
             });
         }

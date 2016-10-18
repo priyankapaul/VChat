@@ -32,14 +32,21 @@ import java.util.Locale;
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
     public ArrayList<Friend> friendArrayList;
-
-    ArrayList<String> list = new ArrayList<String>();
-
     private static String today;
+
+    public ArrayList<String> getSelectedFriends() {
+        ArrayList<String> groupList = new ArrayList<>();
+        for (Friend friend : friendArrayList) {
+            if (friend.isSelected) {
+                groupList.add(friend.getId());
+            }
+        }
+        return groupList;
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public TextView name, message, timestamp, count;
-        public CheckBox checkBoxGroup;
+        public CheckBox checkBoxFriend;
         public CircularNetworkImageView image;
         public ImageView statusImageOnline, statusImageOffline;
 
@@ -50,13 +57,12 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
             message = (TextView) view.findViewById(R.id.message);
             timestamp = (TextView) view.findViewById(R.id.timestamp);
             count = (TextView) view.findViewById(R.id.count);
-            checkBoxGroup = (CheckBox) view.findViewById(R.id.group_checkbox);
+            checkBoxFriend = (CheckBox) view.findViewById(R.id.group_checkbox);
         }
     }
 
 
-
-    public GroupAdapter(Context mContext, ArrayList<Friend> friendArrayList) {
+    public GroupAdapter(ArrayList<Friend> friendArrayList) {
         this.friendArrayList = friendArrayList;
 
         Calendar calendar = Calendar.getInstance();
@@ -72,22 +78,18 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     }
 
 
-
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Friend friend = friendArrayList.get(position);
         holder.name.setText(friend.getName());
         holder.image.setImageUrl(friend.getImage(), BaseApplication.getInstance().getImageLoader());
-
-
 //--------------------------------------------
-        holder.checkBoxGroup.setOnCheckedChangeListener(null);
 
-        //if true, your checkbox will be selected, else unselected
-        holder.checkBoxGroup.setChecked(friendArrayList.get(position).isSelected());
-        holder.checkBoxGroup.setTag(friendArrayList.get(position));
 
-        holder.checkBoxGroup.setOnClickListener(new View.OnClickListener() {
+        holder.checkBoxFriend.setChecked(friendArrayList.get(position).isSelected());
+        holder.checkBoxFriend.setTag(friendArrayList.get(position));
+        holder.checkBoxFriend.setOnClickListener(new View.OnClickListener() {
+
 
             public void onClick(View v) {
                 CheckBox cb = (CheckBox) v;
@@ -96,21 +98,18 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
                 contact.setSelected(cb.isChecked());
                 friendArrayList.get(position).setSelected(cb.isChecked());
 
-                Toast.makeText( v.getContext(), "Clicked on Checkbox: " + cb.getText() + " is "+ friendArrayList.get(position).getId(), Toast.LENGTH_LONG).show();
-               list.add(friendArrayList.get(position).getId());
-
-                System.out.println("list show" + list);
+                Toast.makeText(v.getContext(), "Clicked on Checkbox: " + cb.getText() + " is " + friendArrayList.get(position).getId(), Toast.LENGTH_LONG).show();
+//                groupList.add(friendArrayList.get(position).getId());
+//                System.out.println("groupList show" + groupList);
             }
         });
-
-        holder.checkBoxGroup.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        holder.checkBoxFriend.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                friendArrayList.get(holder.getAdapterPosition()).setSelected(isChecked);
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Friend friend = (Friend) buttonView.getTag();
+                friend.setSelected(isChecked);
             }
         });
-
 //------------------------------------------
 
         // holder.status.setImageDrawable(Drawable.createFromPath(friendArrayList.get(position).getStatus()));
@@ -123,18 +122,18 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
 
         }
 
-          holder.timestamp.setText(getTimeStamp(friend.getTimestamp()));
+        holder.timestamp.setText(getTimeStamp(friend.getTimestamp()));
 //        holder.count.setVisibility(View.INVISIBLE);
 //        holder.timestamp.setVisibility(View.INVISIBLE);
-          holder.message.setVisibility(View.INVISIBLE);
+        holder.message.setVisibility(View.INVISIBLE);
     }
 
 
     @Override
-    public int getItemCount()
-    {
+    public int getItemCount() {
         return friendArrayList.size();
     }
+
     public Friend getItem(int position) {
         return friendArrayList.get(position);
     }
@@ -168,7 +167,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
                 }
             });
         }
-
 
 
         @Override
@@ -211,8 +209,6 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
 
         return timestamp;
     }
-
-
 
 
     public void filter(String charText) {

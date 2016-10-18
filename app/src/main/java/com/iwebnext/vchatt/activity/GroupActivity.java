@@ -37,7 +37,7 @@ public class GroupActivity extends AppCompatActivity {
     public ArrayList<Friend> friendsArrayList;
     private GroupAdapter friendListAdapter;
     private RecyclerView rvFriends;
-    private GroupAdapter gAdapter;
+
     FrameLayout Frame;
 
     @Override
@@ -53,47 +53,27 @@ public class GroupActivity extends AppCompatActivity {
         groupFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                ArrayList<String> groupList = friendListAdapter.getSelectedFriends();
+
                 Intent intent = new Intent(GroupActivity.this, GroupNameActivity.class);
-                ArrayList<String> myList = new ArrayList<String>();
-                intent.putExtra("mylist", myList);
-
-                GroupActivity fragment = new GroupActivity();
-
-//                Bundle bundle = new Bundle();
-//                bundle.putSerializable(Constants.EXTRA_KEY_USER, gAdapter.getItem(position));
-//                // bundle.putSerializable(Constants.EXTRA_KEY_USER, mAdapter.getItemId(position));
-
+                intent.putExtra("groupList", groupList);
                 startActivity(intent);
             }
         });
 
+
+
         friendsArrayList = new ArrayList<>();
-        friendListAdapter = new GroupAdapter(GroupActivity.this, friendsArrayList);
+        friendListAdapter = new GroupAdapter( friendsArrayList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(GroupActivity.this);
         rvFriends.setLayoutManager(layoutManager);
         rvFriends.setAdapter(friendListAdapter);
 
-    fetchFriendList();
+
+        fetchFriendList();
 
     }
-
-//    private List<Friend> currentSelectedItems = new ArrayList<>();
-//
-//    ...
-//
-//    friendListAdapter = new GroupAdapter(items, new GroupAdapter.OnItemCheckListener() {
-//        @Override
-//        public void onItemCheck(Friend item) {
-//            currentSelectedItems.add(item);
-//        }
-//
-//        @Override
-//        public void onItemUncheck(Friend item) {
-//            currentSelectedItems.remove(item);
-//        }
-//    });
-
-
 
     /**
      * fetching the friend list

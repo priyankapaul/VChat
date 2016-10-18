@@ -164,7 +164,8 @@
 //        public ImageButton imageButton;
 //
 //
-//        public  ViewHolder(View view){
+//        public  ViewHolder(View view)
+//        {
 //            super(view);
 //
 //            title = (TextView) view.findViewById(R.id.title_diary);
@@ -201,7 +202,5 @@
 //            //Toast.makeText(context,""+s,Toast.LENGTH_LONG).show();
 //        }
 //    }
-//
-//
 //
 //}

@@ -8,12 +8,11 @@ public class Friend implements Serializable {
     String image, telephone, profession, address;
     int unreadCount;
     boolean status;
-    public Boolean box;
     public boolean isSelected;
     public Friend() {
     }
 
-    public Friend(String id,Boolean box,boolean isSelected, String image, String name, String lastMessage, String profession, String address,String telephone, String timestamp, int unreadCount, boolean status) {
+    public Friend(String id,boolean isSelected, String image, String name, String lastMessage, String profession, String address,String telephone, String timestamp, int unreadCount, boolean status) {
         this.id = id;
         this.name = name;
         this.telephone = telephone;
@@ -24,7 +23,6 @@ public class Friend implements Serializable {
         this.timestamp = timestamp;
         this.unreadCount = unreadCount;
         this.status = status;
-        this.box = box;
         this.isSelected = isSelected;
     }
 
@@ -100,12 +98,6 @@ public class Friend implements Serializable {
 
     public void setStatus(boolean status) {
         this.status = status;
-    }
-    public Boolean getBox() {
-        return box;
-    }
-    public void setBox(Boolean box){
-        this.box = box;
     }
 
     public boolean isSelected() {

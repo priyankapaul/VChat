@@ -6,14 +6,21 @@
     android:paddingTop="20dp"
     android:paddingLeft="15dp"
     android:orientation="horizontal">
+    <FrameLayout
+        android:id="@+id/fl_profile_pic"
+        android:layout_width="150dp"
+        android:layout_height="200dp"
+        android:layout_below="@+id/tv_title"
+        android:layout_gravity="center_horizontal">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/group_image"
-        android:src="@drawable/user_circle"
-        android:layout_above="@+id/group_name"
-        android:layout_centerHorizontal="true" />
+        <LinearLayout
+            android:layout_width="42dp"
+            android:layout_height="43dp"
+            android:layout_gravity="bottom">
+
+        </LinearLayout>
+
+    </FrameLayout>
 
     <EditText
         android:layout_width="match_parent"
@@ -23,11 +30,8 @@
         android:gravity="center_horizontal"
         android:hint="Group Name"
         android:paddingLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:id="@+id/group_name"
-        android:layout_above="@+id/instruction"
+        android:layout_centerVertical="true"
         android:layout_alignRight="@+id/group_image"
         android:layout_alignEnd="@+id/group_image" />
 
@@ -46,9 +50,9 @@
         android:text="Provide a group name and image here"
         android:paddingLeft="10dp"
         android:paddingTop="20dp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/instruction" />
+        android:id="@+id/instruction"
+        android:layout_below="@+id/group_name"
+        android:layout_centerHorizontal="true" />
 
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
@@ -64,6 +68,27 @@
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/group_name"
         android:layout_alignEnd="@+id/group_name" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/group_image"
+        android:src="@drawable/user_circle"
+        android:layout_alignTop="@+id/fl_profile_pic"
+        android:layout_centerHorizontal="true"
+        android:layout_alignBottom="@+id/fl_profile_pic" />
+
+    <ImageButton
+        android:layout_width="45dp"
+        android:id="@+id/btn_select_group_picture"
+        android:src="@drawable/plus_green"
+        android:layout_height="42dp"
+        android:layout_gravity="right|bottom"
+        android:layout_alignBottom="@+id/group_image"
+        android:layout_toRightOf="@+id/fl_profile_pic"
+        android:layout_toEndOf="@+id/fl_profile_pic"
+        android:layout_marginLeft="35dp"
+        android:layout_marginStart="35dp" />
 
 </RelativeLayout>
 

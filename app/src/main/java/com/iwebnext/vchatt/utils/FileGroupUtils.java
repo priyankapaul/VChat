@@ -15,8 +15,8 @@ import java.net.URL;
 /**
  * Created by priyanka on 8/5/16.
  */
-public class FileUploadUtils {
-    private static final String TAG = FileUploadUtils.class.getSimpleName();
+public class FileGroupUtils {
+    private static final String TAG = FileGroupUtils.class.getSimpleName();
 
     private static String LINE_END = "\r\n";
     private static String TWO_HYPHENS = "--";
@@ -25,7 +25,7 @@ public class FileUploadUtils {
 
     public static final int PERMISSIONS_REQUEST_READ_MEDIA = 3;
 
-    public static String uploadAvatar(String fileName, String userId, String uploadUrl) {
+    public static String uploadAvatar(String fileName, String userId,String groupName, String uploadUrl) {
         int serverResponseCode = -1;
 
         HttpURLConnection conn = null;
@@ -54,7 +54,6 @@ public class FileUploadUtils {
             conn.setRequestProperty("ENCTYPE", "multipart/form-data");
             conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + BOUNDARY);
             dataOutputStream = new DataOutputStream(conn.getOutputStream());
-
 
             /**
              * 1st - File Part
@@ -90,6 +89,17 @@ public class FileUploadUtils {
 
             dataOutputStream.writeBytes(LINE_END);
             dataOutputStream.writeBytes(userId);
+            dataOutputStream.writeBytes(LINE_END);
+
+            /**
+             * 3rd - String Part
+             */
+            dataOutputStream.writeBytes(TWO_HYPHENS + BOUNDARY + LINE_END);
+            dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"group_name\"");
+            dataOutputStream.writeBytes(LINE_END);
+
+            dataOutputStream.writeBytes(LINE_END);
+            dataOutputStream.writeBytes(groupName);
             dataOutputStream.writeBytes(LINE_END);
 
 

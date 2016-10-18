@@ -10,7 +10,8 @@ import java.util.Map;
 public class SignUpRequest extends StringRequest {
     private Map<String, String> params;
 
-    public SignUpRequest(String name, String email, String password, String medicalLicenseNo, String profession, String state, String address, String telephone, String website, String type, String social_media_id, Response.Listener<String> listener) {
+    public SignUpRequest(String name, String email, String password, String medicalLicenseNo, String profession, String state, String address, String telephone, String website, String type, String social_media_id, Response.Listener<String> listener)
+    {
         super(Method.POST, EndPoints.REGISTER_USER, listener, null);
         params = new HashMap<>();
         params.put("name", name);
