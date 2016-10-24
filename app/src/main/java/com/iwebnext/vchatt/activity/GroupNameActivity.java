@@ -16,10 +16,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.iwebnext.vchatt.R;
 import com.iwebnext.vchatt.app.BaseApplication;
@@ -39,28 +41,26 @@ public class GroupNameActivity extends AppCompatActivity {
 
     TextView instruction;
     EditText groupName;
+    private String mPeerId, title, mPeerImage;
     ImageView groupImage;
     FloatingActionButton fabDone;
     ProgressDialog progressDialog;
+    ArrayList<String> groupList = new ArrayList<String>();
     private Bitmap bitmap;
     String uploadFile;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.group_name);
 
         groupName = (EditText) findViewById(R.id.group_name);
         instruction = (TextView) findViewById(R.id.instruction);
-        FloatingActionButton fabDone = (FloatingActionButton) findViewById(R.id.tick);
-      //  final ImageButton selectPicture = (ImageButton) findViewById(R.id.btn_select_group_picture);
+        Button btnDone = (Button) findViewById(R.id.tick);
 
-
-        ArrayList<String> groupList = (ArrayList<String>) getIntent().getSerializableExtra("groupList");
-        System.out.println("list is" + groupList);
-
+        groupList = (ArrayList<String>) getIntent().getSerializableExtra("groupList");
+        System.out.println("list iss " + groupList);
 
         Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.user_circle);
         Bitmap circularBitmap = ImageConverter.getRoundedCornerBitmap(bitmap, 100);
@@ -75,8 +75,7 @@ public class GroupNameActivity extends AppCompatActivity {
         if (selectPicture != null) {
             selectPicture.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View v)
-                {
+                public void onClick(View v) {
                     if (v == selectPicture) {
                         showFileChooser();
                     }
@@ -85,13 +84,13 @@ public class GroupNameActivity extends AppCompatActivity {
         }
 
 
-        fabDone.setOnClickListener(new View.OnClickListener()
-        {
+        btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final String name = groupName.getText().toString();
+
                 final String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
-                invokeImageUploadTask(selfUserId,name);
+                invokeImageUploadTask(selfUserId, name, groupList);
             }
         });
 
@@ -122,6 +121,12 @@ public class GroupNameActivity extends AppCompatActivity {
             }
         }
 
+//        final Intent intent = getIntent();
+//        mPeerId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
+//
+//        final String title = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_NAME);
+//      //  final String mPeerImage = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_IMAGE);
+
     }
 
     private void showProgress() {
@@ -145,8 +150,7 @@ public class GroupNameActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
@@ -158,7 +162,7 @@ public class GroupNameActivity extends AppCompatActivity {
                     groupImage.setImageBitmap(bitmap);
 
                     uploadFile = FilePathUtils.getPath(GroupNameActivity.this, filePath);
-                   // invokeImageUploadTask();
+                    // invokeImageUploadTask();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -167,9 +171,9 @@ public class GroupNameActivity extends AppCompatActivity {
         }
     }
 
-    private void invokeImageUploadTask(String userId, String groupName)
-    {
-        String[] params = new String[]{uploadFile, userId, groupName, EndPoints.UPDATE_GROUP_AVATAR};
+    private void invokeImageUploadTask(String userId, String groupName, ArrayList<String> groupList) {
+        String[] params = new String[]{uploadFile, userId, groupName, String.valueOf(groupList), EndPoints.UPDATE_GROUP_AVATAR};
+
         new UploadImageAsyncTask().execute(params);
     }
 
@@ -188,7 +192,7 @@ public class GroupNameActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(String... params) {
-            FileGroupUtils.uploadAvatar(params[0], params[1], params[2], params[3]);
+            FileGroupUtils.uploadAvatar(params[0], params[1], params[2], params[3], params[4]);
             return null;
         }
 
@@ -196,6 +200,11 @@ public class GroupNameActivity extends AppCompatActivity {
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
             progressDialog.dismiss();
+            Toast.makeText(getApplicationContext(), "Group creation successfull", Toast.LENGTH_SHORT).show();
+//            Intent i=new Intent(GroupNameActivity.this,GroupChatRoomActivity.class);
+//
+//            startActivity(i);
+
         }
     }
 

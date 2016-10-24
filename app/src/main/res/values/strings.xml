@@ -6,7 +6,7 @@
     <string name="hint_email">Email</string>
     <string name="err_msg_name">Enter full password</string>
     <string name="err_msg_email">Enter valid email address</string>
-    <string name="title_activity_chat_room_discussion">ChatRoomDiscussionActivity</string>
+    <string name="title_activity_chat_room_discussion">Vchatt</string>
     <string name="action_logout">Logout</string>
     <string name="action_group">Create Group</string>
     <string name="action_setting">Setting</string>

@@ -63,9 +63,26 @@ public class GroupActivity extends AppCompatActivity {
         });
 
 
+//        rvFriends.addOnItemTouchListener(new GroupAdapter.RecyclerTouchListener(GroupActivity.this, rvFriends, new GroupAdapter.ClickListener() {
+//            @Override
+//            public void onClick(View view, int position) {
+//                // when chat is clicked, launch full chat thread activity
+//                Friend friend = friendsArrayList.get(position);
+//                Intent intent = new Intent(GroupActivity.this, GroupNameActivity.class);
+//                intent.putExtra(Constants.EXTRA_KEY_FRIEND_ID, friend.getId());
+//                intent.putExtra(Constants.EXTRA_KEY_FRIEND_NAME, friend.getName());
+//                startActivity(intent);
+//            }
+//
+//            @Override
+//            public void onLongClick(View view, int position) {
+//
+//            }
+//        }));
+
 
         friendsArrayList = new ArrayList<>();
-        friendListAdapter = new GroupAdapter( friendsArrayList);
+        friendListAdapter = new GroupAdapter(friendsArrayList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(GroupActivity.this);
         rvFriends.setLayoutManager(layoutManager);
         rvFriends.setAdapter(friendListAdapter);
@@ -110,8 +127,6 @@ public class GroupActivity extends AppCompatActivity {
                                 friend.setTimestamp(friendObj.getString("created_at"));
                                 friend.setStatus(friendObj.getString("user_status").equals("1"));
                                 friendsArrayList.add(friend);
-
-
                             }
                         }
 
@@ -130,7 +145,7 @@ public class GroupActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(GroupActivity.this,"Network Error" + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(GroupActivity.this, "Network Error" + error.getMessage(), Toast.LENGTH_SHORT).show();
                 VolleyLog.e("Error: ", error.getMessage());
             }
         });

@@ -37,7 +37,7 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.iwebnext.vchatt.R;
-import com.iwebnext.vchatt.adapter.ChatRoomThreadAdapter;
+import com.iwebnext.vchatt.adapter.GroupChatRoomThreadAdapter;
 import com.iwebnext.vchatt.app.BaseApplication;
 import com.iwebnext.vchatt.app.Config;
 import com.iwebnext.vchatt.gcm.NotificationUtils;
@@ -56,7 +56,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChatRoomActivity extends AppCompatActivity {
+public class GroupChatRoomActivity extends AppCompatActivity {
 
     private String TAG = ChatRoomActivity.class.getSimpleName();
 
@@ -64,10 +64,10 @@ public class ChatRoomActivity extends AppCompatActivity {
     private static final int RC_SELECT_VIDEO = 2;
 
     private String mUserId;
-    private String mUserName,mPeerImage;
-    private String mPeerId;
+    private String mUserName, mPeerImage;
+    private String groupId;
     private RecyclerView mRvChatThread;
-    private ChatRoomThreadAdapter mAdapter;
+    private GroupChatRoomThreadAdapter mAdapter;
     private ArrayList<Message> mMessageArrayList;
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private EditText mInputMessage;
@@ -81,29 +81,25 @@ public class ChatRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_room);
 
         final Intent intent = getIntent();
-        mPeerId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
+        groupId = intent.getStringExtra(Constants.EXTRA_KEY_GROUP_ID);
         final String title = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_NAME);
         final String mPeerImage = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_IMAGE);
 
-        System.out.println("la la la friend Id is" + mPeerId);
-
-        if (mPeerId == null) {
+        if (groupId == null) {
             Toast.makeText(getApplicationContext(), "Message not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
 
-
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(title);
+        toolbar.setTitle(groupId);
         setSupportActionBar(toolbar);
-
         toolbar.findViewById(R.id.toolbar).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(ChatRoomActivity.this, FriendProfileActivity.class);
+                Intent i = new Intent(GroupChatRoomActivity.this, FriendProfileActivity.class);
+                i.putExtra(Constants.EXTRA_KEY_GROUP_ID, groupId);
                 i.putExtra(Constants.EXTRA_KEY_FRIEND_NAME,title);
-                i.putExtra(Constants.EXTRA_KEY_FRIEND_ID, mPeerId);
                 i.putExtra(Constants.EXTRA_KEY_FRIEND_IMAGE,mPeerImage);
                 startActivity(i);
 
@@ -123,7 +119,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         mUserName = user.getName();
 
 
-        mAdapter = new ChatRoomThreadAdapter(this, mMessageArrayList, mUserId);
+        mAdapter = new GroupChatRoomThreadAdapter(this, mMessageArrayList, mUserId);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRvChatThread.setLayoutManager(layoutManager);
@@ -149,7 +145,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         });
 
-        fetchChatThread();
+          fetchChatThread();
 
     }
 
@@ -163,7 +159,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 type = Message.VIDEO;
             }
             Uri filePath = data.getData();
-            mUploadFile = FilePathUtils.getPath(ChatRoomActivity.this, filePath);
+            mUploadFile = FilePathUtils.getPath(GroupChatRoomActivity.this, filePath);
 
             invokeImageUploadTask(type);
         }
@@ -241,13 +237,14 @@ public class ChatRoomActivity extends AppCompatActivity {
      */
     private void handlePushNotification(Intent intent) {
         Message message = (Message) intent.getSerializableExtra("message");
-        String peerId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
+        String groupId = intent.getStringExtra(Constants.EXTRA_KEY_GROUP_ID);
 
-        updateMessageList(message, peerId);
+
+        updateMessageList(message, groupId);
     }
 
-    private void updateMessageList(Message message, String peerId) {
-        if (message != null && peerId != null) {
+    private void updateMessageList(Message message, String groupId) {
+        if (message != null && groupId != null) {
             mMessageArrayList.add(message);
             mAdapter.notifyDataSetChanged();
             if (mAdapter.getItemCount() > 1) {
@@ -264,12 +261,12 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void sendMessage() {
         final String message = this.mInputMessage.getText().toString().trim();
 
-        if (TextUtils.isEmpty(message)) {
+        if (TextUtils.isEmpty(message))
+        {
             Toast.makeText(getApplicationContext(), "Enter a message", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        String endPoint = EndPoints.ADD_MESSAGE;
+        String endPoint = EndPoints.ADD_GROUP_MESSAGE;
 
         Log.e(TAG, "endpoint: " + endPoint);
 
@@ -290,7 +287,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                         JSONObject msgObj = obj.getJSONObject("message");
 
-                        String msgId = msgObj.getString("message_id");
+                        String msgId = msgObj.getString("group_message_id");
                         String content = msgObj.getString("content");
                         String createdAt = msgObj.getString("created_at");
                         int type = msgObj.getInt("type");
@@ -328,8 +325,9 @@ public class ChatRoomActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
+
                 params.put("user_id", BaseApplication.getInstance().getPrefManager().getUser().getId());
-                params.put("peer_id", mPeerId);
+                params.put("group_id", groupId);
                 params.put("message", message);
 
                 Log.e(TAG, "Params: " + params.toString());
@@ -358,7 +356,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void fetchChatThread() {
 
         String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
-        String endPoint = EndPoints.MESSAGES.replace("_ID_", mPeerId);
+        String endPoint = EndPoints.FETCH_GROUP_MESSAGES.replace("_ID_", groupId);
         endPoint = endPoint.replace("_MY_", selfUserId);
         Log.e(TAG, "endPoint: " + endPoint);
 
@@ -402,7 +400,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private void invokeImageUploadTask(int type) {
         String userId = BaseApplication.getInstance().getPrefManager().getUser().getId();
-        String[] params = new String[]{mUploadFile, EndPoints.UPLOAD_FILE, userId, mPeerId, String.valueOf(type)};
+        String[] params = new String[]{mUploadFile, EndPoints.UPLOAD_FILE, userId, groupId, String.valueOf(type)};
         new UploadImageAsyncTask().execute(params);
     }
 
@@ -416,7 +414,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = ProgressDialog.show(ChatRoomActivity.this, "Sending...", "Please wait...", false, false);
+            progressDialog = ProgressDialog.show(GroupChatRoomActivity.this, "Sending...", "Please wait...", false, false);
         }
 
         @Override

@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = MainActivity.class.getSimpleName();
     DrawerLayout drawer;
     private TextView navName;
-    private String mPeerId;
+    private String mPeerId,groupId;
     private ImageView navImage;
     FragmentManager fragmentManager;
     SearchQueryListener fragmentListener;
@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         final Intent intent = getIntent();
         mPeerId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
+        groupId = intent.getStringExtra(Constants.EXTRA_KEY_GROUP_ID);
 
 
         HomeFragment homeFragment = new HomeFragment();
@@ -157,6 +158,11 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_group:
                 Intent intent = new Intent(MainActivity.this,GroupActivity.class);
                 startActivity(intent);
+                break;
+
+            case R.id.action_show_group:
+                Intent i = new Intent(MainActivity.this, FriendGroupListActivity.class);
+                startActivity(i);
                 break;
             case R.id.action_logout:
                 BaseApplication.getInstance().logout();

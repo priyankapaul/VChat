@@ -25,7 +25,7 @@ public class FileGroupUtils {
 
     public static final int PERMISSIONS_REQUEST_READ_MEDIA = 3;
 
-    public static String uploadAvatar(String fileName, String userId,String groupName, String uploadUrl) {
+    public static String uploadAvatar(String fileName, String userId,String groupName, String groupList, String uploadUrl ) {
         int serverResponseCode = -1;
 
         HttpURLConnection conn = null;
@@ -100,6 +100,18 @@ public class FileGroupUtils {
 
             dataOutputStream.writeBytes(LINE_END);
             dataOutputStream.writeBytes(groupName);
+            dataOutputStream.writeBytes(LINE_END);
+
+
+            /**
+             * 4th - String Part
+             */
+            dataOutputStream.writeBytes(TWO_HYPHENS + BOUNDARY + LINE_END);
+            dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"group_list\"");
+            dataOutputStream.writeBytes(LINE_END);
+
+            dataOutputStream.writeBytes(LINE_END);
+            dataOutputStream.writeBytes(groupList);
             dataOutputStream.writeBytes(LINE_END);
 
 
@@ -260,7 +272,8 @@ public class FileGroupUtils {
                     sb.append(line);
                 }
                 rd.close();
-            } catch (IOException ioex) {
+            } catch (IOException ioex)
+            {
             }
             Log.i(TAG, "Fileutils response -> " + sb.toString());
             return sb.toString();

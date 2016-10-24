@@ -59,7 +59,7 @@ public class FriendImageDownload extends AppCompatActivity {
         // finally change the color
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.setStatusBarColor(FriendImageDownload.this.getResources().getColor(R.color.black));
-             }
+        }
 
 
         btnDownload.setOnClickListener(new View.OnClickListener() {
@@ -115,7 +115,7 @@ public class FriendImageDownload extends AppCompatActivity {
                 File SDCardRoot = Environment.getExternalStorageDirectory();
                 //create a new file, specifying the path, and the filename
                 //which we want to save the file as.
-                
+
                 Calendar c = Calendar.getInstance();
                 SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
                 String formattedDate = df.format(c.getTime());

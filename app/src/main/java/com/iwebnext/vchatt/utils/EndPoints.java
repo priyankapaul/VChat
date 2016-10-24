@@ -14,6 +14,7 @@ public class EndPoints {
     public static final String MESSAGES = BASE_URL + "/messages/_ID_/_MY_";
     public static final String ADD_MESSAGE = BASE_URL + "/add_message";
     public static final String FRIEND_LIST = BASE_URL + "/friend_list/_ID_";
+    public static final String GROUP_LIST = BASE_URL + "/group_list/_ID_";
     public static final String FRIEND_REQUEST = BASE_URL + "/friend_requests/_ID_";
     public static final String PROFILE = BASE_URL + "/user_profile/_ID_";
     public static final String UPDATE_AVATAR = BASE_URL + "/update_avatar";
@@ -21,10 +22,12 @@ public class EndPoints {
     public static final String UPLOAD_FILE = BASE_URL + "/upload_file";
     public static final String DELETE_CHAT_HISTORY = BASE_URL + "/delete_chat_history";
     //   public static final String USER_STATUS = BASE_URL + "/user_status";
-    public static final String FRIEND_PROFILE= BASE_URL + "/friend_profile/_ID_";
-
+    public static final String FRIEND_PROFILE = BASE_URL + "/friend_profile/_ID_";
     public static final String UPDATE_GROUP_AVATAR = BASE_URL + "/update_group_avatar";
-    public static final String GROUP_DETAILS = BASE_URL + "/group_name";
+
+
+    public static final String ADD_GROUP_MESSAGE = BASE_URL + "/add_group_message";
+    public static final String FETCH_GROUP_MESSAGES = BASE_URL + "/group_messages/_ID_/_MY_";
 
     // TODO - To use standard /v1/ version of APIs
     public static final String NAV_DRAWER = "http://inextwebs.com/gcm_chat/include/nav_drawer.php?id=_ID_";

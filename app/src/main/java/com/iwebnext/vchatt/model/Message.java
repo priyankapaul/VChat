@@ -32,6 +32,7 @@ public class Message implements Serializable {
         this.type = type;
     }
 
+
     public String getId() {
         return id;
     }

@@ -2,10 +2,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingTop="20dp"
+    android:background="@drawable/group_back"
+    android:orientation="horizontal"
     android:paddingLeft="15dp"
-    android:orientation="horizontal">
+    android:paddingTop="20dp">
+
     <FrameLayout
         android:id="@+id/fl_profile_pic"
         android:layout_width="150dp"
@@ -23,72 +24,87 @@
     </FrameLayout>
 
     <EditText
+        android:id="@+id/group_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
+        android:layout_below="@+id/fl_profile_pic"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="83dp"
         android:ems="10"
         android:gravity="center_horizontal"
         android:hint="Group Name"
-        android:paddingLeft="20dp"
-        android:id="@+id/group_name"
-        android:layout_centerVertical="true"
-        android:layout_alignRight="@+id/group_image"
-        android:layout_alignEnd="@+id/group_image" />
+        android:inputType="textEmailAddress"
+        android:paddingLeft="20dp" />
 
 
-<LinearLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:id="@+id/linearLayout">
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</LinearLayout>
+    </LinearLayout>
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Provide a group name and image here"
-        android:paddingLeft="10dp"
-        android:paddingTop="20dp"
         android:id="@+id/instruction"
-        android:layout_below="@+id/group_name"
-        android:layout_centerHorizontal="true" />
-
-    <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:id="@+id/tick"
-        android:src="@drawable/tick"
-        app:layout_anchorGravity="bottom|right|end"
-        app:pressedTranslationZ="16dp"
-        app:rippleColor="#F06292"
-        android:paddingBottom="40dp"
-        android:layout_marginBottom="48dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/group_name"
-        android:layout_alignEnd="@+id/group_name" />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/group_image"
-        android:src="@drawable/user_circle"
-        android:layout_alignTop="@+id/fl_profile_pic"
+        android:layout_below="@+id/group_name"
         android:layout_centerHorizontal="true"
-        android:layout_alignBottom="@+id/fl_profile_pic" />
+        android:gravity="center_horizontal"
+        android:paddingTop="20dp"
+        android:text="Provide a group name and image here" />
+
+    <!--<android.support.design.widget.FloatingActionButton-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="bottom|right"-->
+    <!--android:id="@+id/tick"-->
+    <!--android:src="@drawable/tick"-->
+    <!--app:layout_anchorGravity="bottom|right|end"-->
+    <!--app:pressedTranslationZ="16dp"-->
+    <!--app:rippleColor="#F06292"-->
+    <!--android:paddingBottom="40dp"-->
+    <!--android:layout_marginBottom="48dp"-->
+    <!--android:layout_alignParentBottom="true"-->
+    <!--android:layout_alignRight="@+id/group_name"-->
+    <!--android:layout_alignEnd="@+id/group_name" />-->
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/group_image"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/group_name"
+        android:layout_alignEnd="@+id/instruction"
+        android:layout_alignLeft="@+id/instruction"
+        android:layout_alignRight="@+id/instruction"
+        android:layout_alignStart="@+id/instruction"
+        android:layout_marginBottom="44dp"
+        android:src="@drawable/user_circle" />
 
     <ImageButton
-        android:layout_width="45dp"
         android:id="@+id/btn_select_group_picture"
-        android:src="@drawable/plus_green"
+        android:layout_width="45dp"
         android:layout_height="42dp"
-        android:layout_gravity="right|bottom"
         android:layout_alignBottom="@+id/group_image"
-        android:layout_toRightOf="@+id/fl_profile_pic"
-        android:layout_toEndOf="@+id/fl_profile_pic"
+        android:layout_gravity="right|bottom"
         android:layout_marginLeft="35dp"
-        android:layout_marginStart="35dp" />
+        android:layout_marginStart="35dp"
+        android:layout_toEndOf="@+id/fl_profile_pic"
+        android:layout_toRightOf="@+id/fl_profile_pic"
+        android:src="@drawable/plus_green" />
 
+    <Button
+        android:id="@+id/tick"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/instruction"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_button"
+        android:text="Done"
+        android:textColor="#ffff"
+        android:textSize="15dp" />
 </RelativeLayout>
 

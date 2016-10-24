@@ -122,4 +122,17 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
+    <TextView
+        android:layout_width="55dp"
+        android:layout_height="35dp"
+        android:text="vcvv"
+        android:id="@+id/group_id"
+        android:visibility="gone"
+        android:layout_alignTop="@+id/thumbnail"
+        android:layout_toRightOf="@+id/name_msg_title" />
+
+
+
+
+
 </RelativeLayout>

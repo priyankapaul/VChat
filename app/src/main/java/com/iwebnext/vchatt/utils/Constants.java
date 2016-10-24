@@ -6,6 +6,8 @@ public class Constants {
     public static final String EXTRA_KEY_USER = "extra_user";
     public static final String EXTRA_KEY_USER_EMAIL = "extra_user_email";
     public static final String EXTRA_KEY_FRIEND_ID = "extra_friend_id";
+    public static final String EXTRA_KEY_GROUP_ID = "extra_group_id";
+
     public static final String EXTRA_KEY_FRIEND_NAME = "extra_name";
     public static final String EXTRA_KEY_PUSH_TYPE = "extra_type";
     public static final String EXTRA_KEY_MESSAGE = "extra_message";

@@ -130,6 +130,7 @@ public class HomeFragment extends Fragment implements MainActivity.SearchQueryLi
                 Intent intent = new Intent(getActivity(), ChatRoomActivity.class);
                 intent.putExtra(Constants.EXTRA_KEY_FRIEND_ID, friend.getId());
                 intent.putExtra(Constants.EXTRA_KEY_FRIEND_NAME, friend.getName());
+                intent.putExtra(Constants.EXTRA_KEY_FRIEND_IMAGE, friend.getImage());
                 startActivity(intent);
             }
 

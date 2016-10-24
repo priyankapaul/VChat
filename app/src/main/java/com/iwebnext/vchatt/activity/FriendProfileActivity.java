@@ -57,10 +57,9 @@ public class FriendProfileActivity extends AppCompatActivity {
         setContentView(R.layout.friend_profile_activity);
 
         final Intent intent = getIntent();
+        peerId = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_ID);
         peerName = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_NAME);
-
         peerImage = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_IMAGE);
-        System.out.println("peer image" + peerImage);
         final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

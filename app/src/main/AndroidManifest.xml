@@ -38,18 +38,19 @@
         <activity android:name="com.iwebnext.vchatt.activity.SignUpActivity" />
 
         <activity android:name="com.iwebnext.vchatt.activity.FriendRequestActivity" />
-        <activity android:name="com.iwebnext.vchatt.activity.FriendProfileActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            />
+        <activity
+            android:name="com.iwebnext.vchatt.activity.FriendProfileActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name="com.iwebnext.vchatt.activity.FriendImageDownload"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <activity
             android:name="com.iwebnext.vchatt.activity.GroupActivity"
-            android:label="@string/app_name"
-            />
+            android:label="@string/app_name" />
         <activity
             android:name="com.iwebnext.vchatt.activity.GroupNameActivity"
-            android:label="@string/app_name"
-            />
+            android:label="@string/app_name" />
 
 
         <activity
@@ -57,14 +58,7 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.iwebnext.vchatt.activity.AppExpireActivity" />
-        <activity
-            android:name=".activity.AttachVideoActivity"
-            android:label="@string/app_name"
-            />
-        <activity
-            android:name="com.iwebnext.vchatt.activity.AttachPictureActivity"
-            android:label="@string/app_name"
-            />
+
         <activity
             android:name="com.iwebnext.vchatt.activity.LoginActivity"
             android:label="@string/app_name"
@@ -84,6 +78,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.iwebnext.vchatt.activity.MainActivity" />
         </activity>
+
+
+        <activity
+            android:name="com.iwebnext.vchatt.activity.GroupChatRoomActivity"
+            android:label="@string/title_activity_chat_room_discussion"
+            android:parentActivityName="com.iwebnext.vchatt.activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.iwebnext.vchatt.activity.MainActivity" />
+        </activity>
+
 
         <intent-filter>
             <action android:name="android.intent.action.SEARCH" />
@@ -119,6 +125,9 @@
         <!-- END Added for GCM -->
 
         <activity android:name="com.iwebnext.vchatt.activity.SearchUsersActivity"></activity>
+
+        <activity android:name="com.iwebnext.vchatt.activity.FriendGroupListActivity"></activity>
+
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
