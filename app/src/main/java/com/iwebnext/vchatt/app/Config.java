@@ -16,6 +16,7 @@ public class Config {
 
     // type of push messages
     public static final int PUSH_TYPE_CHATROOM = 1;
+    public static final int PUSH_TYPE_GROUP_CHATROOM =4;
     public static final int PUSH_TYPE_USER = 2;
     public static final int PUSH_TYPE_USER_STATUS = 3;
 

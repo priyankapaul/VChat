@@ -33,11 +33,21 @@ public class Message implements Serializable {
     }
 
 
+
+
     public String getId() {
         return id;
     }
 
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public int getType() {
+        return type;
+    }
+    public int setType(int type) {
         return type;
     }
 
@@ -45,7 +55,15 @@ public class Message implements Serializable {
         return content;
     }
 
+    public String setContent(String content) {
+        return  content;
+    }
+
     public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public String setCreatedAt(String createdAt) {
         return createdAt;
     }
 
@@ -53,7 +71,15 @@ public class Message implements Serializable {
         return userId;
     }
 
+    public String setUserId(String userId) {
+        return userId;
+    }
+
     public String getUserName() {
         return userName;
+    }
+
+    public String setUserName(String userName) {
+        return  userName;
     }
 }

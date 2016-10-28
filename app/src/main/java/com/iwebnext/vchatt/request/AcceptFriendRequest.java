@@ -11,11 +11,11 @@ public class AcceptFriendRequest extends StringRequest {
     final static String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
 
 
-    private static final String REGISTER_REQUEST_URL = "http://inextwebs.com/gcm_chat/include/friend_request_accepted.php";
+    private static final String ACCEPT_REQUEST_URL = "http://inextwebs.com/gcm_chat/include/friend_request_accepted.php";
     private Map<String, String> params;
 
     public AcceptFriendRequest(String id, Response.Listener<String> listener) {
-        super(Method.POST, REGISTER_REQUEST_URL, listener, null);
+        super(Method.POST, ACCEPT_REQUEST_URL, listener, null);
         params = new HashMap<>();
         params.put("friend_id", selfUserId);
         params.put("my_id",id);

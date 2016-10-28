@@ -462,7 +462,8 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     }
 
-    private void parseMessageList(String response) {
+    private void parseMessageList(String response)
+    {
         try {
             JSONObject obj = new JSONObject(response);
 

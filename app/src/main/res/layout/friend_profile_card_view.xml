@@ -11,7 +11,39 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:id="@+id/l5"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="1dp"
+                    android:paddingTop="1dp"
+                    android:paddingLeft="10dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:text="Friend Details : " />
+
+            </RelativeLayout>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:background="@color/material_grey_300" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:id="@+id/l4"
@@ -31,7 +63,7 @@
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:layout_marginRight="10dp"
-                    android:src="@drawable/f_name"/>
+                    android:src="@drawable/color_name"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -62,8 +94,8 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:background="@android:color/darker_gray" />
+            android:layout_height="15dp"
+            android:background="@color/material_grey_300" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -84,7 +116,7 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/f_phone"/>
+                android:src="@drawable/color_telephone"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -116,8 +148,8 @@
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:background="@android:color/darker_gray" />
+            android:layout_height="15dp"
+            android:background="@color/material_grey_300" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -138,7 +170,7 @@
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:layout_marginRight="10dp"
-                    android:src="@drawable/f_place"/>
+                    android:src="@drawable/color_home"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -168,8 +200,9 @@
         </LinearLayout>
         <View
             android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:background="@android:color/darker_gray" />
+            android:layout_height="15dp"
+            android:background="@color/material_grey_300" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:id="@+id/l3"
@@ -189,7 +222,7 @@
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:layout_marginRight="10dp"
-                    android:src="@drawable/f_profession"/>
+                    android:src="@drawable/color_profession"/>
 
                 <TextView
                     android:layout_width="match_parent"

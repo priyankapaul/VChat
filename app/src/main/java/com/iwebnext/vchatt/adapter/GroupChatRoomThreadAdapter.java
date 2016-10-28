@@ -26,7 +26,8 @@ import java.util.Date;
 
 public class GroupChatRoomThreadAdapter extends RecyclerView.Adapter<GroupChatRoomThreadAdapter.ViewHolder> {
 
-    private static String TAG = ChatRoomThreadAdapter.class.getSimpleName();
+
+    private static String TAG = GroupChatRoomThreadAdapter.class.getSimpleName();
 
     private String userId;
     private int SELF = 100;
@@ -144,7 +145,8 @@ public class GroupChatRoomThreadAdapter extends RecyclerView.Adapter<GroupChatRo
 
 
     @Override
-    public int getItemCount() {
+    public int getItemCount()
+    {
         return messageArrayList.size();
     }
 

@@ -69,6 +69,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+        <activity
+            android:name="com.iwebnext.vchatt.activity.TabActivity"
+            android:label="Vchatt"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+
         <activity
             android:name="com.iwebnext.vchatt.activity.ChatRoomActivity"
             android:label="@string/title_activity_chat_room_discussion"
@@ -126,7 +140,7 @@
 
         <activity android:name="com.iwebnext.vchatt.activity.SearchUsersActivity"></activity>
 
-        <activity android:name="com.iwebnext.vchatt.activity.FriendGroupListActivity"></activity>
+        <activity android:name=".activity.FriendGroupListActivity"></activity>
 
 
         <meta-data

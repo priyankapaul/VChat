@@ -45,6 +45,7 @@ import com.iwebnext.vchatt.model.Message;
 import com.iwebnext.vchatt.model.User;
 import com.iwebnext.vchatt.utils.Constants;
 import com.iwebnext.vchatt.utils.EndPoints;
+import com.iwebnext.vchatt.utils.FileGroupUtils;
 import com.iwebnext.vchatt.utils.FilePathUtils;
 import com.iwebnext.vchatt.utils.FileUploadUtils;
 
@@ -58,7 +59,7 @@ import java.util.Map;
 
 public class GroupChatRoomActivity extends AppCompatActivity {
 
-    private String TAG = ChatRoomActivity.class.getSimpleName();
+    private String TAG = GroupChatRoomActivity.class.getSimpleName();
 
     private static final int RC_PICK_IMAGE = 1;
     private static final int RC_SELECT_VIDEO = 2;
@@ -79,13 +80,13 @@ public class GroupChatRoomActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
-
         final Intent intent = getIntent();
         groupId = intent.getStringExtra(Constants.EXTRA_KEY_GROUP_ID);
         final String title = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_NAME);
         final String mPeerImage = intent.getStringExtra(Constants.EXTRA_KEY_FRIEND_IMAGE);
 
-        if (groupId == null) {
+        if (groupId == null)
+        {
             Toast.makeText(getApplicationContext(), "Message not found!", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -99,32 +100,24 @@ public class GroupChatRoomActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i = new Intent(GroupChatRoomActivity.this, FriendProfileActivity.class);
                 i.putExtra(Constants.EXTRA_KEY_GROUP_ID, groupId);
-                i.putExtra(Constants.EXTRA_KEY_FRIEND_NAME,title);
-                i.putExtra(Constants.EXTRA_KEY_FRIEND_IMAGE,mPeerImage);
+                i.putExtra(Constants.EXTRA_KEY_FRIEND_NAME, title);
+                i.putExtra(Constants.EXTRA_KEY_FRIEND_IMAGE, mPeerImage);
                 startActivity(i);
-
             }
         });
 
         mInputMessage = (EditText) findViewById(R.id.message);
         mBtnSend = (Button) findViewById(R.id.btn_send);
-
         mRvChatThread = (RecyclerView) findViewById(R.id.recycler_view);
-
         mMessageArrayList = new ArrayList<>();
-
         // host user
         User user = BaseApplication.getInstance().getPrefManager().getUser();
         mUserId = user.getId();
         mUserName = user.getName();
-
-
         mAdapter = new GroupChatRoomThreadAdapter(this, mMessageArrayList, mUserId);
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRvChatThread.setLayoutManager(layoutManager);
         mRvChatThread.setItemAnimator(new DefaultItemAnimator());
-
         Log.i(TAG, "madapter" + mAdapter);
         mRvChatThread.setAdapter(mAdapter);
 
@@ -145,7 +138,7 @@ public class GroupChatRoomActivity extends AppCompatActivity {
             }
         });
 
-          fetchChatThread();
+        fetchChatThread();
 
     }
 
@@ -202,7 +195,6 @@ public class GroupChatRoomActivity extends AppCompatActivity {
             case R.id.action_logout:
                 BaseApplication.getInstance().logout();
                 break;
-
             case R.id.action_attach_image:
                 chooseImage();
                 return true;
@@ -244,10 +236,14 @@ public class GroupChatRoomActivity extends AppCompatActivity {
     }
 
     private void updateMessageList(Message message, String groupId) {
-        if (message != null && groupId != null) {
+        if (message != null && groupId != null)
+        {
+
             mMessageArrayList.add(message);
             mAdapter.notifyDataSetChanged();
-            if (mAdapter.getItemCount() > 1) {
+
+            if (mAdapter.getItemCount() > 1)
+            {
                 mRvChatThread.getLayoutManager().smoothScrollToPosition(mRvChatThread, null, mAdapter.getItemCount() - 1);
             }
         }
@@ -261,8 +257,7 @@ public class GroupChatRoomActivity extends AppCompatActivity {
     private void sendMessage() {
         final String message = this.mInputMessage.getText().toString().trim();
 
-        if (TextUtils.isEmpty(message))
-        {
+        if (TextUtils.isEmpty(message)) {
             Toast.makeText(getApplicationContext(), "Enter a message", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -357,13 +352,13 @@ public class GroupChatRoomActivity extends AppCompatActivity {
 
         String selfUserId = BaseApplication.getInstance().getPrefManager().getUser().getId();
         String endPoint = EndPoints.FETCH_GROUP_MESSAGES.replace("_ID_", groupId);
+
+
         endPoint = endPoint.replace("_MY_", selfUserId);
         Log.e(TAG, "endPoint: " + endPoint);
-
-
         StringRequest strReq = new StringRequest(Request.Method.GET,
-                endPoint, new Response.Listener<String>() {
-
+                endPoint, new Response.Listener<String>()
+        {
             @Override
             public void onResponse(String response) {
                 Log.e(TAG, "response: " + response);
@@ -400,7 +395,7 @@ public class GroupChatRoomActivity extends AppCompatActivity {
 
     private void invokeImageUploadTask(int type) {
         String userId = BaseApplication.getInstance().getPrefManager().getUser().getId();
-        String[] params = new String[]{mUploadFile, EndPoints.UPLOAD_FILE, userId, groupId, String.valueOf(type)};
+        String[] params = new String[]{mUploadFile, EndPoints.UPLOAD_GROUP_FILE, userId, groupId, String.valueOf(type)};
         new UploadImageAsyncTask().execute(params);
     }
 
@@ -418,8 +413,9 @@ public class GroupChatRoomActivity extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(String... params) {
-            return FileUploadUtils.uploadFile(params[0], params[1], params[2], params[3], params[4]);
+        protected String doInBackground(String... params)
+        {
+            return FileGroupUtils.uploadFile(params[0], params[1], params[2], params[3], params[4]);
         }
 
         @Override
@@ -460,10 +456,10 @@ public class GroupChatRoomActivity extends AppCompatActivity {
 
     }
 
-    private void parseMessageList(String response) {
+    private void parseMessageList(String response)
+    {
         try {
             JSONObject obj = new JSONObject(response);
-
             // check for error
             if (obj.getBoolean("error") == false) {
                 JSONArray msgJsonArr = obj.getJSONArray("messages");

@@ -75,7 +75,8 @@ public class FriendProfileActivity extends AppCompatActivity {
 
         //  collapsingToolbarLayout.setBackground(Drawable.createFromPath(peerImage));
         Context context = this;
-        collapsingToolbarLayout.setContentScrimColor(ContextCompat.getColor(context, R.color.indigo_600));
+        collapsingToolbarLayout.setContentScrimColor(ContextCompat.getColor(context, R.color.indigo_300));
+        collapsingToolbarLayout.setBackgroundResource(ContextCompat.getColor(context, R.color.indigo_A200));
         collapsingToolbarLayout.setStatusBarScrimColor(getResources().getColor(R.color.indigo_900));
 
 

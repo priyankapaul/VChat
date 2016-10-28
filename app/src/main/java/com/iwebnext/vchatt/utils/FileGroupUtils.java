@@ -155,7 +155,7 @@ public class FileGroupUtils {
      *
      * @return
      */
-    public static String uploadFile(String fileName, String uploadUrl, String userId, String peerId, String type) {
+    public static String uploadFile(String fileName, String uploadUrl, String userId, String groupId, String type) {
         int serverResponseCode = -1;
 
         HttpURLConnection conn = null;
@@ -226,11 +226,11 @@ public class FileGroupUtils {
              * 3rd - String Part
              */
             dataOutputStream.writeBytes(TWO_HYPHENS + BOUNDARY + LINE_END);
-            dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"peer_id\"");
+            dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"group_id\"");
             dataOutputStream.writeBytes(LINE_END);
 
             dataOutputStream.writeBytes(LINE_END);
-            dataOutputStream.writeBytes(peerId);
+            dataOutputStream.writeBytes(groupId);
             dataOutputStream.writeBytes(LINE_END);
 
             /**

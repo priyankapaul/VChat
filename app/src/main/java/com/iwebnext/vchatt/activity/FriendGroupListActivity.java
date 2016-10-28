@@ -105,7 +105,8 @@ public class FriendGroupListActivity extends Activity implements MainActivity.Se
         friendListAdapter = new FriendGroupListAdapter(FriendGroupListActivity.this, friendsArrayList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(FriendGroupListActivity.this);
         rvFriends.setLayoutManager(layoutManager);
-        rvFriends.addItemDecoration(new SimpleDividerItemDecoration(
+        rvFriends.addItemDecoration(new SimpleDividerItemDecoration
+        (
                 FriendGroupListActivity.this
         ));
         rvFriends.setItemAnimator(new DefaultItemAnimator());
@@ -195,15 +196,14 @@ public class FriendGroupListActivity extends Activity implements MainActivity.Se
     private void handlePushNotification(Intent intent) {
         int type = intent.getIntExtra("type", -1);
         Message message;
-        String friendId, groupId;
+        String  groupId;
         switch (type) {
             case Config.PUSH_TYPE_CHATROOM:
                 message = (Message) intent.getSerializableExtra(Constants.EXTRA_KEY_MESSAGE);
-                friendId = intent.getStringExtra(Constants.EXTRA_KEY_GROUP_ID);
-                System.out.println("friend id is" + friendId);
+                groupId = intent.getStringExtra(Constants.EXTRA_KEY_GROUP_ID);
 
-                if (message != null && friendId != null) {
-                    updateRow(friendId, message);
+                if (message != null && groupId != null) {
+                    updateRow(groupId, message);
                 }
                 break;
             case Config.PUSH_TYPE_USER:
@@ -214,18 +214,16 @@ public class FriendGroupListActivity extends Activity implements MainActivity.Se
                 break;
             case Config.PUSH_TYPE_USER_STATUS:
                 // update specific user in friend list
-                friendId = intent.getStringExtra(Constants.EXTRA_KEY_GROUP_ID);
+                groupId = intent.getStringExtra(Constants.EXTRA_KEY_GROUP_ID);
                 boolean userStatus = intent.getBooleanExtra(Constants.EXTRA_KEY_USER_STATUS, false);
                 for (Group friend : friendsArrayList) {
-                    if (friend.getId().equals(friendId)) {
+                    if (friend.getId().equals(groupId)) {
                         friendListAdapter.notifyDataSetChanged();
                         break;
                     }
                 }
                 break;
         }
-
-
     }
 
     /**
