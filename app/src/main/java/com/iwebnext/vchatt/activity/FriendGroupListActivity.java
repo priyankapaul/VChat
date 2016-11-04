@@ -194,11 +194,11 @@ public class FriendGroupListActivity extends Activity implements MainActivity.Se
      * Handles new push notification
      */
     private void handlePushNotification(Intent intent) {
-        int type = intent.getIntExtra("type", -1);
+        int type = intent.getIntExtra(Constants.EXTRA_KEY_PUSH_TYPE, -1);
         Message message;
         String  groupId;
         switch (type) {
-            case Config.PUSH_TYPE_CHATROOM:
+            case Config.PUSH_TYPE_GROUP_CHATROOM:
                 message = (Message) intent.getSerializableExtra(Constants.EXTRA_KEY_MESSAGE);
                 groupId = intent.getStringExtra(Constants.EXTRA_KEY_GROUP_ID);
 

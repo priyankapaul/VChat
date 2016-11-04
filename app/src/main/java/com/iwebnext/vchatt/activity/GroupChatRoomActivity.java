@@ -228,11 +228,14 @@ public class GroupChatRoomActivity extends AppCompatActivity {
      * recycler view and scroll it to bottom
      */
     private void handlePushNotification(Intent intent) {
-        Message message = (Message) intent.getSerializableExtra("message");
-        String groupId = intent.getStringExtra(Constants.EXTRA_KEY_GROUP_ID);
-
-
-        updateMessageList(message, groupId);
+        int type = intent.getIntExtra(Constants.EXTRA_KEY_PUSH_TYPE, -1);
+        switch (type) {
+            case Config.PUSH_TYPE_GROUP_CHATROOM:
+                Message message = (Message) intent.getSerializableExtra(Constants.EXTRA_KEY_MESSAGE);
+                String groupId = intent.getStringExtra(Constants.EXTRA_KEY_GROUP_ID);
+                updateMessageList(message, groupId);
+                break;
+        }
     }
 
     private void updateMessageList(Message message, String groupId) {

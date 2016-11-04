@@ -301,7 +301,7 @@ public class VChatGcmPushReceiver extends GcmListenerService {
                 Message message = null;
                 JSONObject msgObj = dataObj.getJSONObject("message");
 
-                String msgId = msgObj.getString("message_id");
+                String msgId = msgObj.getString("group_message_id");
                 String content = msgObj.getString("content");
                 String createdAt = msgObj.getString("created_at");
                 int type = msgObj.getInt("type");
@@ -313,7 +313,7 @@ public class VChatGcmPushReceiver extends GcmListenerService {
 
                     // app is in foreground, broadcast the push message
                     Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
-                    pushNotification.putExtra(Constants.EXTRA_KEY_PUSH_TYPE, Config.PUSH_TYPE_CHATROOM);
+                    pushNotification.putExtra(Constants.EXTRA_KEY_PUSH_TYPE, Config.PUSH_TYPE_GROUP_CHATROOM);
                     pushNotification.putExtra(Constants.EXTRA_KEY_MESSAGE, message);
                     pushNotification.putExtra(Constants.EXTRA_KEY_GROUP_ID, groupId);
                     LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
